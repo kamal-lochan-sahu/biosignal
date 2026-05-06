@@ -1,11 +1,12 @@
 'use client'
 import { useState } from 'react'
-import { Activity } from 'lucide-react'
+import { Activity, ClipboardList } from 'lucide-react'
 import PatientCard from '@/app/components/PatientCard'
 import RiskGauge from '@/app/components/RiskGauge'
 import SHAPExplainer from '@/app/components/SHAPExplainer'
 import VitalsChart from '@/app/components/VitalsChart'
 import AlertPanel from '@/app/components/AlertPanel'
+import News2Score from '@/app/components/News2Score'
 import { predictRisk } from '@/lib/api'
 import type { PredictionResult } from '@/lib/api'
 
@@ -46,11 +47,14 @@ function genChart(v: typeof PATIENTS[0]['vitals']) {
   }))
 }
 
+type Tab = 'dashboard' | 'news2'
+
 export default function Dashboard() {
   const [selected, setSelected] = useState(PATIENTS[0])
   const [results, setResults] = useState<Record<string, PredictionResult>>({})
   const [loading, setLoading] = useState(false)
   const [chartData, setChartData] = useState(() => genChart(PATIENTS[0].vitals))
+  const [activeTab, setActiveTab] = useState<Tab>('dashboard')
 
   const currentResult = results[selected.id]
 
@@ -77,9 +81,15 @@ export default function Dashboard() {
       return { name: p.name, score: r.risk_score, unit: p.unit }
     })
 
+  const tabs = [
+    { id: 'dashboard' as Tab, label: 'ML Dashboard', icon: Activity },
+    { id: 'news2' as Tab, label: 'NEWS2 Score', icon: ClipboardList },
+  ]
+
   return (
     <div className="min-h-screen bg-gray-950 p-4">
-      <div className="flex items-center gap-3 mb-6">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-4">
         <div className="bg-blue-600 p-2 rounded-lg">
           <Activity className="w-6 h-6 text-white" />
         </div>
@@ -93,9 +103,29 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {highRiskAlerts.length > 0 && <div className="mb-4"><AlertPanel alerts={highRiskAlerts} /></div>}
+      {/* Tabs */}
+      <div className="flex gap-2 mb-4">
+        {tabs.map(tab => {
+          const Icon = tab.icon
+          return (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === tab.id
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'}`}>
+              <Icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          )
+        })}
+      </div>
+
+      {highRiskAlerts.length > 0 && (
+        <div className="mb-4"><AlertPanel alerts={highRiskAlerts} /></div>
+      )}
 
       <div className="grid grid-cols-12 gap-4">
+        {/* Patient List */}
         <div className="col-span-3 space-y-2">
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
             Patients ({PATIENTS.length})
@@ -108,37 +138,58 @@ export default function Dashboard() {
           ))}
         </div>
 
+        {/* Main Content */}
         <div className="col-span-9 space-y-4">
+          {/* Patient Header */}
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-bold text-white">{selected.name}</h2>
-                <p className="text-sm text-gray-400">{selected.age} years • {selected.unit} • ID: {selected.id}</p>
+                <p className="text-sm text-gray-400">
+                  {selected.age} years • {selected.unit} • ID: {selected.id}
+                </p>
               </div>
-              <button onClick={handlePredict} disabled={loading}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white font-semibold px-6 py-2 rounded-lg text-sm transition-all">
-                {loading ? 'Predicting...' : 'Predict Risk'}
-              </button>
+              {activeTab === 'dashboard' && (
+                <button onClick={handlePredict} disabled={loading}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white font-semibold px-6 py-2 rounded-lg text-sm transition-all">
+                  {loading ? 'Predicting...' : 'Predict Risk'}
+                </button>
+              )}
             </div>
           </div>
 
-          {currentResult && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col items-center justify-center">
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                  Deterioration Risk (Next 6h)
-                </h3>
-                <RiskGauge score={currentResult.risk_score} level={currentResult.risk_level} />
-              </div>
+          {/* Tab Content */}
+          {activeTab === 'dashboard' && (
+            <>
+              {currentResult && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col items-center justify-center">
+                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                      Deterioration Risk (Next 6h)
+                    </h3>
+                    <RiskGauge score={currentResult.risk_score} level={currentResult.risk_level} />
+                  </div>
+                  <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                    <SHAPExplainer factors={currentResult.top_factors} />
+                  </div>
+                </div>
+              )}
               <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <SHAPExplainer factors={currentResult.top_factors} />
+                <VitalsChart data={chartData} />
               </div>
-            </div>
+            </>
           )}
 
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <VitalsChart data={chartData} />
-          </div>
+          {activeTab === 'news2' && (
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <ClipboardList className="w-5 h-5 text-blue-400" />
+                <h3 className="font-semibold text-white">NEWS2 Score — {selected.name}</h3>
+                <span className="text-xs text-gray-500 ml-auto">NHS National Early Warning Score 2</span>
+              </div>
+              <News2Score initialVitals={selected.vitals} />
+            </div>
+          )}
         </div>
       </div>
     </div>
