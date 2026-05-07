@@ -216,11 +216,11 @@ export default function Dashboard() {
                 </>
               )}
               {activeTab === 'news2' && <News2Score key={selected.id} initialVitals={selected.vitals} />}
-              {activeTab === 'sofa' && <SofaScore key={selected.id} />}
+              {activeTab === 'sofa' && <SofaScore key={selected.id} initialVitals={selected.vitals} />}
               {activeTab === 'timeline' && <PatientTimeline key={selected.id} patientName={selected.name} admitTime="2026-05-04 08:00" />}
-              {activeTab === 'fluid' && <FluidBalance key={selected.id} />}
-              {activeTab === 'sepsis' && <SepsisAlert key={selected.id} />}
-              {activeTab === 'apache' && <ApacheII key={selected.id} />}
+              {activeTab === 'fluid' && <FluidBalance key={selected.id} patientName={selected.name} />}
+              {activeTab === 'sepsis' && <SepsisAlert key={selected.id} initialVitals={selected.vitals} />}
+              {activeTab === 'apache' && <ApacheII key={selected.id} initialVitals={selected.vitals} initialAge={selected.age} />}
             </div>
           </div>
         </div>

@@ -13,16 +13,22 @@ interface SepsisInput {
   lactate: number
 }
 
+interface Props {
+  initialVitals?: {
+    respiratory_rate_mean: number
+    bp_systolic_mean: number
+    heart_rate_mean: number
+  }
+}
+
 function calcSepsis(v: SepsisInput) {
   if (!v.suspected_infection) return { level: 'none', qsofa: 0, sirs: 0 }
 
-  // qSOFA
   let qsofa = 0
   if (v.resp_rate >= 22) qsofa++
   if (v.altered_mentation) qsofa++
   if (v.sbp <= 100) qsofa++
 
-  // SIRS
   let sirs = 0
   if (v.temp < 36 || v.temp > 38) sirs++
   if (v.heart_rate > 90) sirs++
@@ -38,14 +44,14 @@ function calcSepsis(v: SepsisInput) {
   }
 }
 
-export default function SepsisAlert() {
+export default function SepsisAlert({ initialVitals }: Props) {
   const [vals, setVals] = useState<SepsisInput>({
     suspected_infection: true,
-    resp_rate: 20,
+    resp_rate: initialVitals?.respiratory_rate_mean ?? 20,
     altered_mentation: false,
-    sbp: 110,
+    sbp: initialVitals?.bp_systolic_mean ?? 110,
     temp: 38.5,
-    heart_rate: 95,
+    heart_rate: initialVitals?.heart_rate_mean ?? 95,
     wbc: 13,
     lactate: 1.5,
   })
