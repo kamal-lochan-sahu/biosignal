@@ -3,16 +3,18 @@ import { useState } from 'react'
 import { PlusCircle, MinusCircle } from 'lucide-react'
 
 interface Entry { label: string; amount: number; type: 'input' | 'output'; time: string }
+interface Props { patientName?: string }
 
-export default function FluidBalance() {
-  const [entries, setEntries] = useState<Entry[]>([
+export default function FluidBalance({ patientName }: Props) {
+  const defaultEntries: Entry[] = [
     { label: 'IV NS 0.9%', amount: 500, type: 'input', time: '08:00' },
     { label: 'IV Medications', amount: 150, type: 'input', time: '09:00' },
     { label: 'Oral Intake', amount: 200, type: 'input', time: '10:00' },
     { label: 'Urine Output', amount: 350, type: 'output', time: '08:00' },
     { label: 'Drain Output', amount: 80, type: 'output', time: '10:00' },
-  ])
+  ]
 
+  const [entries, setEntries] = useState<Entry[]>(defaultEntries)
   const [form, setForm] = useState({ label: '', amount: 0, type: 'input' as 'input' | 'output', time: '12:00' })
 
   const totalIn = entries.filter(e => e.type === 'input').reduce((s, e) => s + e.amount, 0)
@@ -27,6 +29,9 @@ export default function FluidBalance() {
 
   return (
     <div className="space-y-4">
+      {patientName && (
+        <p className="text-xs text-gray-500">Patient: <span className="text-gray-300 font-medium">{patientName}</span> — 24hr fluid tracking</p>
+      )}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-blue-950/50 border border-blue-800 rounded-lg p-4 text-center">
           <p className="text-xs text-blue-400 uppercase tracking-wider">Total Input</p>

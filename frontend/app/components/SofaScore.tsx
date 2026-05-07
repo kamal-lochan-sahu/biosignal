@@ -10,6 +10,13 @@ interface SofaValues {
   creatinine: number
 }
 
+interface Props {
+  initialVitals?: {
+    bp_systolic_mean: number
+    bp_diastolic_mean: number
+  }
+}
+
 function calcSofa(v: SofaValues) {
   let resp = 0
   if (v.pao2_fio2 < 100) resp = 4
@@ -60,11 +67,20 @@ function calcSofa(v: SofaValues) {
   }
 }
 
-export default function SofaScore() {
+export default function SofaScore({ initialVitals }: Props) {
+  const map = initialVitals
+    ? Math.round((initialVitals.bp_systolic_mean + 2 * initialVitals.bp_diastolic_mean) / 3)
+    : 75
+
   const [vals, setVals] = useState<SofaValues>({
-    pao2_fio2: 350, platelets: 180, bilirubin: 1.0,
-    map: 75, gcs: 15, creatinine: 1.0
+    pao2_fio2: 350,
+    platelets: 180,
+    bilirubin: 1.0,
+    map,
+    gcs: 15,
+    creatinine: 1.0,
   })
+
   const { total, mortality, breakdown } = calcSofa(vals)
   const color = total >= 11 ? 'text-red-400' : total >= 7 ? 'text-orange-400' : total >= 3 ? 'text-yellow-400' : 'text-green-400'
   const bg = total >= 11 ? 'bg-red-950/50 border-red-800' : total >= 7 ? 'bg-orange-950/50 border-orange-800' : total >= 3 ? 'bg-yellow-950/50 border-yellow-800' : 'bg-green-950/50 border-green-800'
