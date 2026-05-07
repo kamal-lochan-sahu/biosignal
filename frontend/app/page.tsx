@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Activity, ClipboardList, Heart, Users, Droplets, AlertTriangle, BarChart2, FileText, Download, Clock } from 'lucide-react'
+import { Activity, ClipboardList, Heart, Users, Droplets, AlertTriangle, BarChart2, FileText, Download, Clock, Microscope } from 'lucide-react'
 import PatientCard from '@/app/components/PatientCard'
 import RiskGauge from '@/app/components/RiskGauge'
 import SHAPExplainer from '@/app/components/SHAPExplainer'
@@ -16,6 +16,7 @@ import ApacheII from '@/app/components/ApacheII'
 import ShiftReport from '@/app/components/ShiftReport'
 import ModelPerformance from '@/app/components/ModelPerformance'
 import ExportData from '@/app/components/ExportData'
+import ReportAnalyzer from '@/app/components/ReportAnalyzer'
 import { predictRisk } from '@/lib/api'
 import type { PredictionResult } from '@/lib/api'
 
@@ -56,7 +57,7 @@ function genChart(v: typeof PATIENTS[0]['vitals']) {
   }))
 }
 
-type Tab = 'dashboard' | 'news2' | 'sofa' | 'heatmap' | 'timeline' | 'fluid' | 'sepsis' | 'apache' | 'shift' | 'model' | 'export'
+type Tab = 'dashboard' | 'news2' | 'sofa' | 'heatmap' | 'timeline' | 'fluid' | 'sepsis' | 'apache' | 'shift' | 'model' | 'export' | 'analyzer'
 
 const TABS: { id: Tab; label: string; icon: React.ElementType; global?: boolean }[] = [
   { id: 'dashboard', label: 'ML Dashboard', icon: Activity },
@@ -70,6 +71,7 @@ const TABS: { id: Tab; label: string; icon: React.ElementType; global?: boolean 
   { id: 'shift', label: 'Shift Report', icon: FileText, global: true },
   { id: 'model', label: 'Model Stats', icon: BarChart2, global: true },
   { id: 'export', label: 'Export', icon: Download, global: true },
+  { id: 'analyzer', label: 'Report Analyzer', icon: Microscope, global: true },
 ]
 
 export default function Dashboard() {
@@ -159,6 +161,7 @@ export default function Dashboard() {
           {activeTab === 'shift' && <ShiftReport patients={PATIENTS} results={results} />}
           {activeTab === 'model' && <ModelPerformance />}
           {activeTab === 'export' && <ExportData patients={PATIENTS} results={results} />}
+          {activeTab === 'analyzer' && <ReportAnalyzer />}
         </div>
       ) : (
         <div className="grid grid-cols-12 gap-4">
@@ -217,7 +220,7 @@ export default function Dashboard() {
               )}
               {activeTab === 'news2' && <News2Score key={selected.id} initialVitals={selected.vitals} />}
               {activeTab === 'sofa' && <SofaScore key={selected.id} initialVitals={selected.vitals} />}
-              {activeTab === 'timeline' && <PatientTimeline key={selected.id} patientName={selected.name} admitTime="2026-05-04 08:00" />}
+              {activeTab === 'timeline' && <PatientTimeline key={selected.id} patientName={selected.name} admitTime="2026-05-04 08:00" vitals={selected.vitals} />}
               {activeTab === 'fluid' && <FluidBalance key={selected.id} patientName={selected.name} />}
               {activeTab === 'sepsis' && <SepsisAlert key={selected.id} initialVitals={selected.vitals} />}
               {activeTab === 'apache' && <ApacheII key={selected.id} initialVitals={selected.vitals} initialAge={selected.age} />}
