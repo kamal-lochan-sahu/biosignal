@@ -1,12 +1,21 @@
 'use client'
 import { useState } from 'react'
-import { Activity, ClipboardList } from 'lucide-react'
+import { Activity, ClipboardList, Heart, Users, Droplets, AlertTriangle, BarChart2, FileText, Download, Clock } from 'lucide-react'
 import PatientCard from '@/app/components/PatientCard'
 import RiskGauge from '@/app/components/RiskGauge'
 import SHAPExplainer from '@/app/components/SHAPExplainer'
 import VitalsChart from '@/app/components/VitalsChart'
 import AlertPanel from '@/app/components/AlertPanel'
 import News2Score from '@/app/components/News2Score'
+import SofaScore from '@/app/components/SofaScore'
+import PatientHeatmap from '@/app/components/PatientHeatmap'
+import PatientTimeline from '@/app/components/PatientTimeline'
+import FluidBalance from '@/app/components/FluidBalance'
+import SepsisAlert from '@/app/components/SepsisAlert'
+import ApacheII from '@/app/components/ApacheII'
+import ShiftReport from '@/app/components/ShiftReport'
+import ModelPerformance from '@/app/components/ModelPerformance'
+import ExportData from '@/app/components/ExportData'
 import { predictRisk } from '@/lib/api'
 import type { PredictionResult } from '@/lib/api'
 
@@ -47,7 +56,21 @@ function genChart(v: typeof PATIENTS[0]['vitals']) {
   }))
 }
 
-type Tab = 'dashboard' | 'news2'
+type Tab = 'dashboard' | 'news2' | 'sofa' | 'heatmap' | 'timeline' | 'fluid' | 'sepsis' | 'apache' | 'shift' | 'model' | 'export'
+
+const TABS: { id: Tab; label: string; icon: React.ElementType; global?: boolean }[] = [
+  { id: 'dashboard', label: 'ML Dashboard', icon: Activity },
+  { id: 'news2', label: 'NEWS2', icon: ClipboardList },
+  { id: 'sofa', label: 'SOFA', icon: Heart },
+  { id: 'heatmap', label: 'Heatmap', icon: Users, global: true },
+  { id: 'timeline', label: 'Timeline', icon: Clock },
+  { id: 'fluid', label: 'Fluid Balance', icon: Droplets },
+  { id: 'sepsis', label: 'Sepsis', icon: AlertTriangle },
+  { id: 'apache', label: 'APACHE II', icon: BarChart2 },
+  { id: 'shift', label: 'Shift Report', icon: FileText, global: true },
+  { id: 'model', label: 'Model Stats', icon: BarChart2, global: true },
+  { id: 'export', label: 'Export', icon: Download, global: true },
+]
 
 export default function Dashboard() {
   const [selected, setSelected] = useState(PATIENTS[0])
@@ -63,13 +86,18 @@ export default function Dashboard() {
     setChartData(genChart(p.vitals))
   }
 
+  const handleSelectById = (id: string) => {
+    const p = PATIENTS.find(p => p.id === id)
+    if (p) { handleSelect(p); setActiveTab('dashboard') }
+  }
+
   const handlePredict = async () => {
     setLoading(true)
     try {
       const result = await predictRisk(selected.vitals)
       setResults(prev => ({ ...prev, [selected.id]: result }))
     } catch {
-      alert('API Error — Is backend running on port 8000?')
+      alert('API Error — Is backend running?')
     }
     setLoading(false)
   }
@@ -81,10 +109,7 @@ export default function Dashboard() {
       return { name: p.name, score: r.risk_score, unit: p.unit }
     })
 
-  const tabs = [
-    { id: 'dashboard' as Tab, label: 'ML Dashboard', icon: Activity },
-    { id: 'news2' as Tab, label: 'NEWS2 Score', icon: ClipboardList },
-  ]
+  const isGlobal = TABS.find(t => t.id === activeTab)?.global
 
   return (
     <div className="min-h-screen bg-gray-950 p-4">
@@ -104,16 +129,16 @@ export default function Dashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-4">
-        {tabs.map(tab => {
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {TABS.map(tab => {
           const Icon = tab.icon
           return (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 activeTab === tab.id
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'}`}>
-              <Icon className="w-4 h-4" />
+              <Icon className="w-3.5 h-3.5" />
               {tab.label}
             </button>
           )
@@ -124,74 +149,82 @@ export default function Dashboard() {
         <div className="mb-4"><AlertPanel alerts={highRiskAlerts} /></div>
       )}
 
-      <div className="grid grid-cols-12 gap-4">
-        {/* Patient List */}
-        <div className="col-span-3 space-y-2">
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-            Patients ({PATIENTS.length})
-          </h2>
-          {PATIENTS.map(p => (
-            <PatientCard key={p.id}
-              patient={{ ...p, ...(results[p.id] || {}) }}
-              selected={selected.id === p.id}
-              onClick={() => handleSelect(p)} />
-          ))}
+      {/* Global tabs — full width, no sidebar */}
+      {isGlobal ? (
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+          <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+            {(() => { const t = TABS.find(t => t.id === activeTab)!; const Icon = t.icon; return <><Icon className="w-5 h-5 text-blue-400" />{t.label}</> })()}
+          </h3>
+          {activeTab === 'heatmap' && <PatientHeatmap patients={PATIENTS} results={results} onSelect={handleSelectById} />}
+          {activeTab === 'shift' && <ShiftReport patients={PATIENTS} results={results} />}
+          {activeTab === 'model' && <ModelPerformance />}
+          {activeTab === 'export' && <ExportData patients={PATIENTS} results={results} />}
         </div>
-
-        {/* Main Content */}
-        <div className="col-span-9 space-y-4">
-          {/* Patient Header */}
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold text-white">{selected.name}</h2>
-                <p className="text-sm text-gray-400">
-                  {selected.age} years • {selected.unit} • ID: {selected.id}
-                </p>
-              </div>
-              {activeTab === 'dashboard' && (
-                <button onClick={handlePredict} disabled={loading}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white font-semibold px-6 py-2 rounded-lg text-sm transition-all">
-                  {loading ? 'Predicting...' : 'Predict Risk'}
-                </button>
-              )}
-            </div>
+      ) : (
+        <div className="grid grid-cols-12 gap-4">
+          {/* Patient List */}
+          <div className="col-span-3 space-y-2">
+            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+              Patients ({PATIENTS.length})
+            </h2>
+            {PATIENTS.map(p => (
+              <PatientCard key={p.id}
+                patient={{ ...p, ...(results[p.id] || {}) }}
+                selected={selected.id === p.id}
+                onClick={() => handleSelect(p)} />
+            ))}
           </div>
 
-          {/* Tab Content */}
-          {activeTab === 'dashboard' && (
-            <>
-              {currentResult && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col items-center justify-center">
-                    <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                      Deterioration Risk (Next 6h)
-                    </h3>
-                    <RiskGauge score={currentResult.risk_score} level={currentResult.risk_level} />
-                  </div>
-                  <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                    <SHAPExplainer factors={currentResult.top_factors} />
-                  </div>
+          {/* Main Content */}
+          <div className="col-span-9 space-y-4">
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-white">{selected.name}</h2>
+                  <p className="text-sm text-gray-400">{selected.age} years • {selected.unit} • ID: {selected.id}</p>
                 </div>
-              )}
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-                <VitalsChart data={chartData} />
+                {activeTab === 'dashboard' && (
+                  <button onClick={handlePredict} disabled={loading}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 text-white font-semibold px-6 py-2 rounded-lg text-sm transition-all">
+                    {loading ? 'Predicting...' : 'Predict Risk'}
+                  </button>
+                )}
               </div>
-            </>
-          )}
-
-          {activeTab === 'news2' && (
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <ClipboardList className="w-5 h-5 text-blue-400" />
-                <h3 className="font-semibold text-white">NEWS2 Score — {selected.name}</h3>
-                <span className="text-xs text-gray-500 ml-auto">NHS National Early Warning Score 2</span>
-              </div>
-              <News2Score initialVitals={selected.vitals} />
             </div>
-          )}
+
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+              {activeTab === 'dashboard' && (
+                <>
+                  {currentResult ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col items-center justify-center">
+                          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Deterioration Risk (Next 6h)</h3>
+                          <RiskGauge score={currentResult.risk_score} level={currentResult.risk_level} />
+                        </div>
+                        <SHAPExplainer factors={currentResult.top_factors} />
+                      </div>
+                      <VitalsChart data={chartData} />
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <Activity className="w-12 h-12 text-gray-700 mx-auto mb-3" />
+                      <p className="text-gray-500">Click <span className="text-blue-400 font-semibold">Predict Risk</span> to run ML analysis</p>
+                      <p className="text-xs text-gray-600 mt-1">LightGBM model with SHAP explainability</p>
+                    </div>
+                  )}
+                </>
+              )}
+              {activeTab === 'news2' && <News2Score key={selected.id} initialVitals={selected.vitals} />}
+              {activeTab === 'sofa' && <SofaScore key={selected.id} />}
+              {activeTab === 'timeline' && <PatientTimeline key={selected.id} patientName={selected.name} admitTime="2026-05-04 08:00" />}
+              {activeTab === 'fluid' && <FluidBalance key={selected.id} />}
+              {activeTab === 'sepsis' && <SepsisAlert key={selected.id} />}
+              {activeTab === 'apache' && <ApacheII key={selected.id} />}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
