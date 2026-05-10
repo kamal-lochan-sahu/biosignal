@@ -18,6 +18,7 @@ import ModelPerformance from '@/app/components/ModelPerformance'
 import ExportData from '@/app/components/ExportData'
 import ReportAnalyzer from '@/app/components/ReportAnalyzer'
 import { predictRisk } from '@/lib/api'
+import LanguageToggle, { useLang, translations } from '@/app/components/LanguageToggle'
 import type { PredictionResult } from '@/lib/api'
 
 const PATIENTS = [
@@ -81,6 +82,8 @@ export default function Dashboard() {
   const [chartData, setChartData] = useState(() => genChart(PATIENTS[0].vitals))
   const [activeTab, setActiveTab] = useState<Tab>('dashboard')
 
+  const { lang } = useLang()
+  const t = translations[lang]
   const currentResult = results[selected.id]
 
   const handleSelect = (p: typeof PATIENTS[0]) => {
@@ -128,7 +131,8 @@ export default function Dashboard() {
         </div>
         <div className="ml-auto flex items-center gap-2">
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-          <span className="text-xs text-gray-400">Live</span>
+          <span className="text-xs text-gray-400">{t.live}</span>
+          <LanguageToggle />
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import KeepAlive from '@/app/components/KeepAlive'
+import { LanguageProvider } from '@/app/components/LanguageToggle'
 import EntryAnimation from '@/app/components/EntryAnimation'
 
 export const metadata: Metadata = {
@@ -10,6 +11,8 @@ export const metadata: Metadata = {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
   },
+  manifest: '/manifest.json',
+  themeColor: '#2563eb',
   openGraph: {
     title: 'BioSignal — ICU Early Warning System',
     description: 'Real-time ML predictions for ICU patient deterioration. Built with LightGBM, FastAPI, and Next.js.',
@@ -37,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="bg-gray-950 text-white antialiased">
+        <LanguageProvider>
         <EntryAnimation />
         <KeepAlive />
         <div className="bg-yellow-950/60 border-b border-yellow-800/50 px-4 py-2 text-center">
@@ -46,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </p>
         </div>
         {children}
+        </LanguageProvider>
       </body>
     </html>
   )
