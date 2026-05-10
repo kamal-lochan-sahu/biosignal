@@ -1,0 +1,12 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#030712"/>
+  <rect width="1200" height="4" fill="#2563eb"/>
+  <rect x="80" y="200" width="60" height="60" rx="12" fill="#2563eb"/>
+  <text x="115" y="242" font-family="monospace" font-size="32" fill="white" text-anchor="middle">♥</text>
+  <text x="160" y="248" font-family="Arial" font-size="48" font-weight="bold" fill="white">BioSignal</text>
+  <text x="80" y="300" font-family="Arial" font-size="24" fill="#9ca3af">ICU Early Warning System — Powered by ML</text>
+  <text x="80" y="380" font-family="Arial" font-size="20" fill="#4ade80">✓ LightGBM Model  ROC-AUC 0.71</text>
+  <text x="80" y="420" font-family="Arial" font-size="20" fill="#4ade80">✓ SHAP Explainability</text>
+  <text x="80" y="460" font-family="Arial" font-size="20" fill="#4ade80">✓ Real-time Risk Prediction</text>
+  <text x="80" y="540" font-family="Arial" font-size="18" fill="#6b7280">biosignal-seven.vercel.app</text>
+</svg>
