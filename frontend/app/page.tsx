@@ -61,6 +61,7 @@ type Tab = 'dashboard' | 'news2' | 'sofa' | 'heatmap' | 'timeline' | 'fluid' | '
 
 const TABS: { id: Tab; label: string; icon: React.ElementType; global?: boolean }[] = [
   { id: 'dashboard', label: 'ML Dashboard', icon: Activity },
+  { id: 'analyzer', label: 'Report Analyzer', icon: Microscope, global: true },
   { id: 'news2', label: 'NEWS2', icon: ClipboardList },
   { id: 'sofa', label: 'SOFA', icon: Heart },
   { id: 'heatmap', label: 'Heatmap', icon: Users, global: true },
@@ -71,7 +72,6 @@ const TABS: { id: Tab; label: string; icon: React.ElementType; global?: boolean 
   { id: 'shift', label: 'Shift Report', icon: FileText, global: true },
   { id: 'model', label: 'Model Stats', icon: BarChart2, global: true },
   { id: 'export', label: 'Export', icon: Download, global: true },
-  { id: 'analyzer', label: 'Report Analyzer', icon: Microscope, global: true },
 ]
 
 export default function Dashboard() {
@@ -117,8 +117,10 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-950 p-4">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="bg-blue-600 p-2 rounded-lg">
-          <Activity className="w-6 h-6 text-white" />
+        <div className="bg-blue-600 p-2 rounded-lg flex items-center justify-center">
+          <svg width="24" height="24" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="2,20 7,20 11,8 15,32 18,14 21,24 25,4 29,34 32,16 35,20 38,20" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
         <div>
           <h1 className="text-xl font-bold text-white">BioSignal</h1>
