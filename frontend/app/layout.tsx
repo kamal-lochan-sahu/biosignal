@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     apple: '/favicon.svg',
   },
   manifest: '/manifest.json',
-  themeColor: '#2563eb',
+
   openGraph: {
     title: 'BioSignal — ICU Early Warning System',
     description: 'Real-time ML predictions for ICU patient deterioration. Built with LightGBM, FastAPI, and Next.js.',
