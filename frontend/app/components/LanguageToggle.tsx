@@ -430,48 +430,62 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export default function LanguageToggle() {
   const { lang, setLang, regionalLang } = useLang()
+  const [open, setOpen] = useState(false)
   const [showAll, setShowAll] = useState(false)
   const t = translations[lang]
 
+  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0]
   const regionalInfo = LANGUAGES.find(l => l.code === regionalLang)
   const showRegional = regionalLang !== 'en'
 
   return (
-    <div className="relative flex items-center gap-1">
-      {/* English button */}
-      <button onClick={() => { setLang('en'); setShowAll(false) }}
-        className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all ${lang === 'en' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500'}`}>
-        🇬🇧 EN
+    <div className="relative">
+      <button onClick={() => { setOpen(o => !o); setShowAll(false) }}
+        className="flex items-center gap-1.5 bg-gray-900 border border-gray-700 hover:border-gray-500 text-gray-300 text-xs px-3 py-1.5 rounded-lg transition-all">
+        <span>{currentLang.flag} {currentLang.label}</span>
+        <span className="text-gray-500">▾</span>
       </button>
 
-      {/* Regional button — only if different from English */}
-      {showRegional && regionalInfo && (
-        <button onClick={() => { setLang(regionalLang); setShowAll(false) }}
-          className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all ${lang === regionalLang ? 'bg-blue-600 border-blue-600 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500'}`}>
-          {regionalInfo.flag} {regionalInfo.label}
-        </button>
-      )}
-
-      {/* Choose Language button */}
-      <button onClick={() => setShowAll(o => !o)}
-        className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all ${showAll ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500'}`}>
-        🌐
-      </button>
-
-      {/* Full dropdown */}
-      {showAll && (
-        <div className="absolute right-0 top-9 bg-gray-900 border border-gray-700 rounded-xl overflow-hidden z-50 w-48 shadow-2xl max-h-80 overflow-y-auto">
+      {open && !showAll && (
+        <div className="absolute right-0 top-9 bg-gray-900 border border-gray-700 rounded-xl overflow-hidden z-50 w-52 shadow-2xl">
           <div className="px-3 py-2 border-b border-gray-800">
             <p className="text-xs text-gray-500">{t.chooseLanguage}</p>
           </div>
-          {LANGUAGES.map(l => (
-            <button key={l.code} onClick={() => { setLang(l.code); setShowAll(false) }}
-              className={`w-full text-left px-4 py-2 text-xs transition-all flex items-center gap-2 ${lang === l.code ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
-              <span>{l.flag}</span>
-              <span>{l.label}</span>
-              <span className={`ml-auto text-xs ${lang === l.code ? 'text-blue-200' : 'text-gray-600'}`}>{l.name}</span>
+          <button onClick={() => { setLang('en'); setOpen(false) }}
+            className={`w-full text-left px-4 py-2.5 text-xs transition-all flex items-center gap-2 ${lang === 'en' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
+            <span>🇬🇧</span><span>English</span>
+            {lang === 'en' && <span className="ml-auto">✓</span>}
+          </button>
+          {showRegional && regionalInfo && (
+            <button onClick={() => { setLang(regionalLang); setOpen(false) }}
+              className={`w-full text-left px-4 py-2.5 text-xs transition-all flex items-center gap-2 ${lang === regionalLang ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
+              <span>{regionalInfo.flag}</span><span>{regionalInfo.label}</span>
+              {lang === regionalLang && <span className="ml-auto">✓</span>}
             </button>
-          ))}
+          )}
+          <button onClick={() => setShowAll(true)}
+            className="w-full text-left px-4 py-2.5 text-xs text-gray-300 hover:bg-gray-800 transition-all flex items-center gap-2 border-t border-gray-800">
+            <span>🌐</span><span>{t.chooseLanguage}</span><span className="ml-auto text-gray-600">›</span>
+          </button>
+        </div>
+      )}
+
+      {open && showAll && (
+        <div className="absolute right-0 top-9 bg-gray-900 border border-gray-700 rounded-xl overflow-hidden z-50 w-52 shadow-2xl">
+          <button onClick={() => setShowAll(false)}
+            className="w-full text-left px-4 py-2.5 text-xs text-gray-400 hover:bg-gray-800 border-b border-gray-800 flex items-center gap-2">
+            <span>‹</span><span>Back</span>
+          </button>
+          <div className="max-h-72 overflow-y-auto">
+            {LANGUAGES.map(l => (
+              <button key={l.code} onClick={() => { setLang(l.code); setOpen(false); setShowAll(false) }}
+                className={`w-full text-left px-4 py-2 text-xs transition-all flex items-center gap-2 ${lang === l.code ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
+                <span>{l.flag}</span>
+                <span>{l.label}</span>
+                <span className={`ml-auto text-xs ${lang === l.code ? 'text-blue-200' : 'text-gray-600'}`}>{l.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
