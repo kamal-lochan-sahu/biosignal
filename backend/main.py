@@ -9,6 +9,10 @@ import shap
 
 app = FastAPI(title="BioSignal API")
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 # CORS — frontend se connect hone ke liye
 app.add_middleware(
     CORSMiddleware,
