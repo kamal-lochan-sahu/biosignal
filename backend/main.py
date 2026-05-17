@@ -10,6 +10,7 @@ import shap
 app = FastAPI(title="BioSignal API")
 
 @app.get("/health")
+@app.head("/health")
 def health_check():
     return {"status": "ok"}
 
