@@ -60,19 +60,19 @@ function genChart(v: typeof PATIENTS[0]['vitals']) {
 
 type Tab = 'dashboard' | 'news2' | 'sofa' | 'heatmap' | 'timeline' | 'fluid' | 'sepsis' | 'apache' | 'shift' | 'model' | 'export' | 'analyzer'
 
-const TABS: { id: Tab; label: string; icon: React.ElementType; global?: boolean }[] = [
-  { id: 'dashboard', label: 'ML Dashboard', icon: Activity },
-  { id: 'analyzer', label: 'Report Analyzer', icon: Microscope, global: true },
-  { id: 'news2', label: 'NEWS2', icon: ClipboardList },
-  { id: 'sofa', label: 'SOFA', icon: Heart },
-  { id: 'heatmap', label: 'Heatmap', icon: Users, global: true },
-  { id: 'timeline', label: 'Timeline', icon: Clock },
-  { id: 'fluid', label: 'Fluid Balance', icon: Droplets },
-  { id: 'sepsis', label: 'Sepsis', icon: AlertTriangle },
-  { id: 'apache', label: 'APACHE II', icon: BarChart2 },
-  { id: 'shift', label: 'Shift Report', icon: FileText, global: true },
-  { id: 'model', label: 'Model Stats', icon: BarChart2, global: true },
-  { id: 'export', label: 'Export', icon: Download, global: true },
+const TABS: { id: Tab; label: string; icon: React.ElementType; global?: boolean; tKey: string }[] = [
+  { id: 'dashboard', label: 'ML Dashboard', icon: Activity, tKey: 'tab_dashboard' },
+  { id: 'analyzer', label: 'Report Analyzer', icon: Microscope, global: true, tKey: 'tab_analyzer' },
+  { id: 'news2', label: 'NEWS2', icon: ClipboardList, tKey: 'news2' },
+  { id: 'sofa', label: 'SOFA', icon: Heart, tKey: 'sofa' },
+  { id: 'heatmap', label: 'Heatmap', icon: Users, global: true, tKey: 'tab_heatmap' },
+  { id: 'timeline', label: 'Timeline', icon: Clock, tKey: 'tab_timeline' },
+  { id: 'fluid', label: 'Fluid Balance', icon: Droplets, tKey: 'tab_fluid' },
+  { id: 'sepsis', label: 'Sepsis', icon: AlertTriangle, tKey: 'tab_sepsis' },
+  { id: 'apache', label: 'APACHE II', icon: BarChart2, tKey: 'tab_apache' },
+  { id: 'shift', label: 'Shift Report', icon: FileText, global: true, tKey: 'tab_shift' },
+  { id: 'model', label: 'Model Stats', icon: BarChart2, global: true, tKey: 'tab_model' },
+  { id: 'export', label: 'Export', icon: Download, global: true, tKey: 'tab_export' },
 ]
 
 export default function Dashboard() {
@@ -147,7 +147,7 @@ export default function Dashboard() {
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'}`}>
               <Icon className="w-3.5 h-3.5" />
-              {tab.label}
+              {t[tab.tKey] || tab.label}
             </button>
           )
         })}
