@@ -408,9 +408,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
         setRegionalLang(detected)
 
-        if (!localStorage.getItem('biosignal-lang')) {
-          setLangState(detected)
-        }
+        // Regional detected but English is default
+        // setLangState(detected) — intentionally not auto-switching
         setDetected(true)
       })
       .catch(() => setDetected(true))
