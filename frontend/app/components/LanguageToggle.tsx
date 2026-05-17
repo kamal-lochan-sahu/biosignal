@@ -3,28 +3,28 @@ import { useState, useEffect, createContext, useContext } from 'react'
 
 export type Lang = 'en'|'hi'|'bn'|'te'|'ta'|'mr'|'gu'|'kn'|'ml'|'or'|'pa'|'zh'|'es'|'ar'|'pt'|'ru'|'ja'|'fr'|'de'|'ko'|'id'
 
-export const LANGUAGES: { code: Lang; label: string; flag: string; name: string }[] = [
+export const LANGUAGES: { code: Lang; label: string; flag: string; name: string; region?: string }[] = [
   { code: 'en', label: 'English',    flag: '🇬🇧', name: 'English'    },
-  { code: 'hi', label: 'हिन्दी',      flag: '🇮🇳', name: 'Hindi'      },
-  { code: 'bn', label: 'বাংলা',       flag: '🇮🇳', name: 'Bengali'    },
-  { code: 'te', label: 'తెలుగు',      flag: '🇮🇳', name: 'Telugu'     },
-  { code: 'ta', label: 'தமிழ்',       flag: '🇮🇳', name: 'Tamil'      },
-  { code: 'mr', label: 'मराठी',       flag: '🇮🇳', name: 'Marathi'    },
-  { code: 'gu', label: 'ગુજરાતી',     flag: '🇮🇳', name: 'Gujarati'   },
-  { code: 'kn', label: 'ಕನ್ನಡ',       flag: '🇮🇳', name: 'Kannada'    },
-  { code: 'ml', label: 'മലയാളം',      flag: '🇮🇳', name: 'Malayalam'  },
-  { code: 'or', label: 'ଓଡ଼ିଆ',       flag: '🇮🇳', name: 'Odia'       },
-  { code: 'pa', label: 'ਪੰਜਾਬੀ',      flag: '🇮🇳', name: 'Punjabi'    },
-  { code: 'zh', label: '中文',         flag: '🇨🇳', name: 'Chinese'    },
-  { code: 'es', label: 'Español',     flag: '🇪🇸', name: 'Spanish'    },
-  { code: 'ar', label: 'العربية',     flag: '🇸🇦', name: 'Arabic'     },
-  { code: 'pt', label: 'Português',   flag: '🇧🇷', name: 'Portuguese' },
-  { code: 'ru', label: 'Русский',     flag: '🇷🇺', name: 'Russian'    },
-  { code: 'ja', label: '日本語',       flag: '🇯🇵', name: 'Japanese'   },
-  { code: 'fr', label: 'Français',    flag: '🇫🇷', name: 'French'     },
-  { code: 'de', label: 'Deutsch',     flag: '🇩🇪', name: 'German'     },
-  { code: 'ko', label: '한국어',       flag: '🇰🇷', name: 'Korean'     },
-  { code: 'id', label: 'Indonesia',   flag: '🇮🇩', name: 'Indonesian' },
+  { code: 'hi', label: 'हिन्दी',      flag: '🇮🇳', name: 'Hindi',      region: 'IN-UP,IN-MP,IN-RJ,IN-DL,IN-HR,IN-UK,IN-HP,IN-CG,IN-JH,IN-BR' },
+  { code: 'bn', label: 'বাংলা',       flag: '🇮🇳', name: 'Bengali',    region: 'IN-WB,IN-TR,BD' },
+  { code: 'te', label: 'తెలుగు',      flag: '🇮🇳', name: 'Telugu',     region: 'IN-AP,IN-TG' },
+  { code: 'ta', label: 'தமிழ்',       flag: '🇮🇳', name: 'Tamil',      region: 'IN-TN,IN-PY' },
+  { code: 'mr', label: 'मराठी',       flag: '🇮🇳', name: 'Marathi',    region: 'IN-MH' },
+  { code: 'gu', label: 'ગુજરાતી',     flag: '🇮🇳', name: 'Gujarati',   region: 'IN-GJ' },
+  { code: 'kn', label: 'ಕನ್ನಡ',       flag: '🇮🇳', name: 'Kannada',    region: 'IN-KA' },
+  { code: 'ml', label: 'മലയാളം',      flag: '🇮🇳', name: 'Malayalam',  region: 'IN-KL' },
+  { code: 'or', label: 'ଓଡ଼ିଆ',       flag: '🇮🇳', name: 'Odia',       region: 'IN-OD,IN-OR' },
+  { code: 'pa', label: 'ਪੰਜਾਬੀ',      flag: '🇮🇳', name: 'Punjabi',    region: 'IN-PB' },
+  { code: 'de', label: 'Deutsch',     flag: '🇩🇪', name: 'German',     region: 'DE,AT,CH' },
+  { code: 'fr', label: 'Français',    flag: '🇫🇷', name: 'French',     region: 'FR,BE,LU' },
+  { code: 'es', label: 'Español',     flag: '🇪🇸', name: 'Spanish',    region: 'ES,MX,AR,CO,CL,PE' },
+  { code: 'pt', label: 'Português',   flag: '🇧🇷', name: 'Portuguese', region: 'PT,BR' },
+  { code: 'ru', label: 'Русский',     flag: '🇷🇺', name: 'Russian',    region: 'RU,BY,KZ' },
+  { code: 'ar', label: 'العربية',     flag: '🇸🇦', name: 'Arabic',     region: 'SA,AE,EG,IQ,SY,JO,KW,QA,BH,OM,YE,LB,MA,DZ,TN,LY' },
+  { code: 'zh', label: '中文',         flag: '🇨🇳', name: 'Chinese',    region: 'CN,TW,HK,SG' },
+  { code: 'ja', label: '日本語',       flag: '🇯🇵', name: 'Japanese',   region: 'JP' },
+  { code: 'ko', label: '한국어',       flag: '🇰🇷', name: 'Korean',     region: 'KR' },
+  { code: 'id', label: 'Indonesia',   flag: '🇮🇩', name: 'Indonesian', region: 'ID' },
 ]
 
 export const translations: Record<Lang, Record<string, string>> = {
@@ -78,7 +78,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     live: 'సక్రియం', patients: 'రోగులు', predictRisk: 'ప్రమాదం అంచనా',
     predicting: 'విశ్లేషణ జరుగుతోంది...', backendLive: 'సర్వర్ సక్రియం',
     pinging: 'కనెక్ట్ అవుతోంది...', reconnecting: 'మళ్ళీ కనెక్ట్',
-    disclaimer: '⚠️ డెమో మాత్రమే — BioSignal MIMIC-IV డేటాపై శిక్షణ పొందింది. వైద్య నిర్ణయాలకు వినియోగించవద్దు।',
+    disclaimer: '⚠️ డెమో మాత్రమే — BioSignal MIMIC-IV డేటాపై శిక్షణ పొందింది. వైద్య నిర్ణయాలకు వినియోగించవద్దు.',
     clickPredict: 'క్లిక్ చేయండి', toRunML: 'ML విశ్లేషణ అమలు చేయడానికి',
     lightgbm: 'SHAP వివరణతో LightGBM మోడల్',
     tab_dashboard: 'ML డాష్‌బోర్డ్', tab_analyzer: 'రిపోర్ట్ విశ్లేషకుడు',
@@ -284,12 +284,12 @@ export const translations: Record<Lang, Record<string, string>> = {
     chooseLanguage: '言語を選択',
   },
   fr: {
-    subtitle: 'Système d\'alerte précoce ICU — Propulsé par ML',
+    subtitle: "ICU Système d'alerte précoce — Propulsé par ML",
     live: 'En direct', patients: 'Patients', predictRisk: 'Prédire le risque',
     predicting: 'Analyse en cours...', backendLive: 'Serveur actif',
     pinging: 'Connexion...', reconnecting: 'Reconnexion',
-    disclaimer: '⚠️ Démo uniquement — BioSignal utilise des données simulées entraînées sur MIMIC-IV. Ne pas utiliser pour des décisions médicales.',
-    clickPredict: 'Cliquez', toRunML: 'pour lancer l\'analyse ML',
+    disclaimer: "⚠️ Démo uniquement — BioSignal utilise des données simulées entraînées sur MIMIC-IV. Ne pas utiliser pour des décisions médicales.",
+    clickPredict: 'Cliquez', toRunML: "pour lancer l'analyse ML",
     lightgbm: 'Modèle LightGBM avec explicabilité SHAP',
     tab_dashboard: 'Tableau ML', tab_analyzer: 'Analyseur de rapports',
     tab_heatmap: 'Carte thermique', tab_timeline: 'Chronologie',
@@ -345,67 +345,127 @@ export const translations: Record<Lang, Record<string, string>> = {
   },
 }
 
-export const LanguageContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: 'en', setLang: () => {} })
+// Country code → Lang mapping
+const COUNTRY_LANG: Record<string, Lang> = {
+  // India — state level via region
+  IN: 'hi', // default Indian = Hindi
+  // World
+  DE: 'de', AT: 'de', CH: 'de',
+  FR: 'fr', BE: 'fr', LU: 'fr',
+  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es',
+  PT: 'pt', BR: 'pt',
+  RU: 'ru', BY: 'ru', KZ: 'ru',
+  SA: 'ar', AE: 'ar', EG: 'ar', IQ: 'ar', SY: 'ar', JO: 'ar',
+  KW: 'ar', QA: 'ar', BH: 'ar', OM: 'ar', YE: 'ar', LB: 'ar',
+  MA: 'ar', DZ: 'ar', TN: 'ar', LY: 'ar',
+  CN: 'zh', TW: 'zh', HK: 'zh', SG: 'zh',
+  JP: 'ja', KR: 'ko', ID: 'id',
+}
+
+// India region → Lang
+const INDIA_REGION_LANG: Record<string, Lang> = {
+  'AP': 'te', 'TG': 'te',
+  'TN': 'ta', 'PY': 'ta',
+  'MH': 'mr',
+  'GJ': 'gu',
+  'KA': 'kn',
+  'KL': 'ml',
+  'OD': 'or', 'OR': 'or',
+  'WB': 'bn', 'TR': 'bn',
+  'PB': 'pa',
+}
+
+export const LanguageContext = createContext<{ lang: Lang; setLang: (l: Lang) => void; regionalLang: Lang }>({
+  lang: 'en', setLang: () => {}, regionalLang: 'en'
+})
 export const useLang = () => useContext(LanguageContext)
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>('en')
+  const [regionalLang, setRegionalLang] = useState<Lang>('en')
+  const [detected, setDetected] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('biosignal-lang') as Lang
-    if (saved && translations[saved]) { setLangState(saved); return }
-    const bl = navigator.language.toLowerCase()
-    if (bl.startsWith('hi')) setLangState('hi')
-    else if (bl.startsWith('bn')) setLangState('bn')
-    else if (bl.startsWith('te')) setLangState('te')
-    else if (bl.startsWith('ta')) setLangState('ta')
-    else if (bl.startsWith('mr')) setLangState('mr')
-    else if (bl.startsWith('gu')) setLangState('gu')
-    else if (bl.startsWith('kn')) setLangState('kn')
-    else if (bl.startsWith('ml')) setLangState('ml')
-    else if (bl.startsWith('or') || bl.startsWith('od')) setLangState('or')
-    else if (bl.startsWith('pa')) setLangState('pa')
-    else if (bl.startsWith('zh')) setLangState('zh')
-    else if (bl.startsWith('es')) setLangState('es')
-    else if (bl.startsWith('ar')) setLangState('ar')
-    else if (bl.startsWith('pt')) setLangState('pt')
-    else if (bl.startsWith('ru')) setLangState('ru')
-    else if (bl.startsWith('ja')) setLangState('ja')
-    else if (bl.startsWith('fr')) setLangState('fr')
-    else if (bl.startsWith('de')) setLangState('de')
-    else if (bl.startsWith('ko')) setLangState('ko')
-    else if (bl.startsWith('id')) setLangState('id')
+    if (saved && translations[saved]) {
+      setLangState(saved)
+    }
+
+    // IP geolocation detect
+    fetch('https://ipapi.co/json/')
+      .then(r => r.json())
+      .then(data => {
+        const country = data.country_code as string
+        const region = data.region_code as string
+
+        let detected: Lang = 'en'
+
+        if (country === 'IN') {
+          detected = INDIA_REGION_LANG[region] || 'hi'
+        } else {
+          detected = COUNTRY_LANG[country] || 'en'
+        }
+
+        setRegionalLang(detected)
+
+        if (!localStorage.getItem('biosignal-lang')) {
+          setLangState(detected)
+        }
+        setDetected(true)
+      })
+      .catch(() => setDetected(true))
   }, [])
 
-  const setLang = (l: Lang) => { setLangState(l); localStorage.setItem('biosignal-lang', l) }
+  const setLang = (l: Lang) => {
+    setLangState(l)
+    localStorage.setItem('biosignal-lang', l)
+  }
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang }}>
+    <LanguageContext.Provider value={{ lang, setLang, regionalLang }}>
       {children}
     </LanguageContext.Provider>
   )
 }
 
 export default function LanguageToggle() {
-  const { lang, setLang } = useLang()
-  const [open, setOpen] = useState(false)
-  const current = LANGUAGES.find(l => l.code === lang)!
+  const { lang, setLang, regionalLang } = useLang()
+  const [showAll, setShowAll] = useState(false)
   const t = translations[lang]
 
+  const regionalInfo = LANGUAGES.find(l => l.code === regionalLang)
+  const showRegional = regionalLang !== 'en'
+
   return (
-    <div className="relative">
-      <button onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1.5 bg-gray-900 border border-gray-700 hover:border-gray-500 text-gray-300 text-xs px-3 py-1.5 rounded-lg transition-all">
-        <span>{current.flag} {current.label}</span>
-        <span className="text-gray-500">▾</span>
+    <div className="relative flex items-center gap-1">
+      {/* English button */}
+      <button onClick={() => { setLang('en'); setShowAll(false) }}
+        className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all ${lang === 'en' ? 'bg-blue-600 border-blue-600 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500'}`}>
+        🇬🇧 EN
       </button>
-      {open && (
+
+      {/* Regional button — only if different from English */}
+      {showRegional && regionalInfo && (
+        <button onClick={() => { setLang(regionalLang); setShowAll(false) }}
+          className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all ${lang === regionalLang ? 'bg-blue-600 border-blue-600 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500'}`}>
+          {regionalInfo.flag} {regionalInfo.label}
+        </button>
+      )}
+
+      {/* Choose Language button */}
+      <button onClick={() => setShowAll(o => !o)}
+        className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all ${showAll ? 'bg-gray-700 border-gray-600 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:border-gray-500'}`}>
+        🌐
+      </button>
+
+      {/* Full dropdown */}
+      {showAll && (
         <div className="absolute right-0 top-9 bg-gray-900 border border-gray-700 rounded-xl overflow-hidden z-50 w-48 shadow-2xl max-h-80 overflow-y-auto">
           <div className="px-3 py-2 border-b border-gray-800">
             <p className="text-xs text-gray-500">{t.chooseLanguage}</p>
           </div>
           {LANGUAGES.map(l => (
-            <button key={l.code} onClick={() => { setLang(l.code); setOpen(false) }}
+            <button key={l.code} onClick={() => { setLang(l.code); setShowAll(false) }}
               className={`w-full text-left px-4 py-2 text-xs transition-all flex items-center gap-2 ${lang === l.code ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
               <span>{l.flag}</span>
               <span>{l.label}</span>
