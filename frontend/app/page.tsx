@@ -117,9 +117,9 @@ export default function Dashboard() {
   const isGlobal = TABS.find(t => t.id === activeTab)?.global
 
   return (
-    <div className="min-h-screen bg-gray-950 p-4">
+    <div className="min-h-screen bg-gray-950 p-3 lg:p-4">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
         <div className="bg-blue-600 p-2 rounded-lg flex items-center justify-center">
           <svg width="24" height="24" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
             <polyline points="2,20 7,20 11,8 15,32 18,14 21,24 25,4 29,34 32,16 35,20 38,20" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
@@ -137,7 +137,7 @@ export default function Dashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-1.5 mb-4">
+      <div className="flex gap-1.5 mb-4 overflow-x-auto pb-2 no-scrollbar">
         {TABS.map(tab => {
           const Icon = tab.icon
           return (
@@ -170,22 +170,26 @@ export default function Dashboard() {
           {activeTab === 'analyzer' && <ReportAnalyzer />}
         </div>
       ) : (
-        <div className="grid grid-cols-12 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Patient List */}
-          <div className="col-span-3 space-y-2">
-            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+          <div className="lg:col-span-3">
+            <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 hidden lg:block">
               Patients ({PATIENTS.length})
             </h2>
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar lg:flex-col">
             {PATIENTS.map(p => (
+              <div key={p.id} className="flex-shrink-0 w-48 lg:w-auto">
               <PatientCard key={p.id}
                 patient={{ ...p, ...(results[p.id] || {}) }}
                 selected={selected.id === p.id}
                 onClick={() => handleSelect(p)} />
+              </div>
             ))}
+            </div>
           </div>
 
           {/* Main Content */}
-          <div className="col-span-9 space-y-4">
+          <div className="lg:col-span-9 space-y-4">
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
