@@ -55,7 +55,7 @@ export default function ModelPerformance(){
             <BarChart data={featureImportance} layout="vertical" margin={{top:0,right:4,left:0,bottom:0}}>
               <XAxis type="number" tick={{fill:'#475569',fontSize:10,fontFamily:'var(--font-data)'}} axisLine={false} tickLine={false}/>
               <YAxis dataKey="feature" type="category" tick={{fill:'#94a3b8',fontSize:10,fontFamily:'var(--font-data)'}} width={65} axisLine={false} tickLine={false}/>
-              <Tooltip contentStyle={tooltipStyle} formatter={(v:number)=>`${(v*100).toFixed(0)}%`}/>
+              <Tooltip contentStyle={tooltipStyle} formatter={(v:any)=>`${(Number(v)*100).toFixed(0)}%`}/>
               <Bar dataKey="importance" radius={[0,4,4,0]} animationDuration={800}>
                 {featureImportance.map((_,i)=>(<Cell key={i} fill={barColors[i]}/>))}
               </Bar>
