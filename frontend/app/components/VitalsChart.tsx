@@ -93,7 +93,6 @@ export default function VitalsChart({ data }: Props) {
           <span style={{
             fontSize:      '10px',
             fontFamily:    'var(--font-data, monospace)',
-            color:         'var(--text-muted)',
             padding:       '2px 7px',
             borderRadius:  '100px',
             background:    'var(--primary-dim)',
@@ -171,7 +170,6 @@ export default function VitalsChart({ data }: Props) {
                 lineHeight: 1,
               }}>
                 {value ?? '—'}
-                <span style={{ fontSize: '9px', color: 'var(--text-muted)', marginLeft: '2px' }}>{unit}</span>
               </div>
               <div style={{ fontSize: '9px', color: 'var(--text-muted)', marginTop: '3px' }}>{label}</div>
               <div style={{
