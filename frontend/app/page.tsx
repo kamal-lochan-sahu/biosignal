@@ -144,8 +144,8 @@ export default function Dashboard() {
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 activeTab === tab.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800'}`}>
+                  ? 'bg-blue-600 text-white flex-shrink-0'
+                  : 'bg-gray-900 text-gray-400 hover:text-white border border-gray-800 flex-shrink-0'}`}>
               <Icon className="w-3.5 h-3.5" />
               {t[tab.tKey] || tab.label}
             </button>
