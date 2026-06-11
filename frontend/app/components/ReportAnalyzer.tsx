@@ -115,7 +115,7 @@ export default function ReportAnalyzer(){
               <input type="number" value={vitals.age} onChange={e=>setVitals(p=>({...p,age:parseInt(e.target.value)||0}))} style={inp}/>
             </div>
           </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px'}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'10px'}}>
             {[
               {label:'Heart Rate (bpm)',key:'heart_rate',normal:'60-100'},
               {label:'SpO₂ (%)',key:'spo2',normal:'95-100'},
@@ -158,7 +158,7 @@ export default function ReportAnalyzer(){
           {parseSuccess&&(
             <div style={{background:'var(--success-dim)',border:'1px solid var(--success-border)',borderRadius:'10px',padding:'12px 16px'}}>
               <p style={{fontSize:'12px',color:'var(--clr-success)',fontWeight:600,marginBottom:'8px',fontFamily:'var(--font-data)'}}>✓ Parsed — {vitals.name}, Age {vitals.age}</p>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'4px'}}>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'4px'}}>
                 {[`HR: ${vitals.heart_rate} bpm`,`SpO₂: ${vitals.spo2}%`,`BP: ${vitals.bp_systolic}/${vitals.bp_diastolic}`,`RR: ${vitals.respiratory_rate}/min`,`Temp: ${vitals.temperature}°C`,`Age: ${vitals.age}y`].map(s=>(
                   <span key={s} style={{fontSize:'11px',color:'var(--text-secondary)',fontFamily:'var(--font-data)'}}>{s}</span>
                 ))}
