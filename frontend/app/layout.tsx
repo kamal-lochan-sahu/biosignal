@@ -17,11 +17,11 @@ export const metadata: Metadata = {
   openGraph: {
     title:'BioSignal — ICU Early Warning System',
     description:'Real-time ML predictions for ICU patient deterioration. Built with LightGBM, FastAPI, and Next.js.',
-    url:'https://biosignal-seven.vercel.app', siteName:'BioSignal',
-    images:[{url:'https://biosignal-seven.vercel.app/og-image.png',width:1200,height:630,alt:'BioSignal ICU Early Warning System'}],
+    url:'https://biosignal-puce.vercel.app', siteName:'BioSignal',
+    images:[{url:'https://biosignal-puce.vercel.app/og-image.png',width:1200,height:630,alt:'BioSignal ICU Early Warning System'}],
     type:'website',
   },
-  twitter: { card:'summary_large_image', title:'BioSignal — ICU Early Warning System', description:'ML-powered ICU patient deterioration prediction.', images:['https://biosignal-seven.vercel.app/og-image.png'] },
+  twitter: { card:'summary_large_image', title:'BioSignal — ICU Early Warning System', description:'ML-powered ICU patient deterioration prediction.', images:['https://biosignal-puce.vercel.app/og-image.png'] },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
