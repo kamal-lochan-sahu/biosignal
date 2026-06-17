@@ -1,12 +1,44 @@
 <svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1200" height="630" fill="#030712"/>
-  <rect width="1200" height="4" fill="#2563eb"/>
-  <rect x="80" y="200" width="60" height="60" rx="12" fill="#2563eb"/>
-  <text x="115" y="242" font-family="monospace" font-size="32" fill="white" text-anchor="middle">♥</text>
-  <text x="160" y="248" font-family="Arial" font-size="48" font-weight="bold" fill="white">BioSignal</text>
-  <text x="80" y="300" font-family="Arial" font-size="24" fill="#9ca3af">ICU Early Warning System — Powered by ML</text>
-  <text x="80" y="380" font-family="Arial" font-size="20" fill="#4ade80">✓ LightGBM Model  ROC-AUC 0.71</text>
-  <text x="80" y="420" font-family="Arial" font-size="20" fill="#4ade80">✓ SHAP Explainability</text>
-  <text x="80" y="460" font-family="Arial" font-size="20" fill="#4ade80">✓ Real-time Risk Prediction</text>
-  <text x="80" y="540" font-family="Arial" font-size="18" fill="#6b7280">biosignal-seven.vercel.app</text>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#04080f"/>
+      <stop offset="100%" stop-color="#0a1220"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+  <rect width="1200" height="4" fill="#00d4ff"/>
+
+  <!-- Logo -->
+  <rect x="80" y="190" width="64" height="64" rx="14" fill="#0c1424" stroke="#00d4ff" stroke-width="1.5"/>
+  <polyline points="92,222 102,222 107,210 112,234 117,216 121,222 132,222"
+    fill="none" stroke="#00d4ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="164" y="238" font-family="Arial, sans-serif" font-size="48" font-weight="800" fill="#e2e8f0">BioSignal</text>
+  <text x="80" y="300" font-family="Arial, sans-serif" font-size="24" fill="#94a3b8">ICU Early Warning System — Powered by ML</text>
+
+  <!-- Feature checkmarks -->
+  <circle cx="92" cy="372" r="9" fill="#101b2d" stroke="#00ff8c" stroke-width="1.5"/>
+  <path d="M88,372 L91,375 L97,368" stroke="#00ff8c" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="112" y="378" font-family="Arial, sans-serif" font-size="20" fill="#00ff8c">LightGBM Model — ROC-AUC 0.71</text>
+
+  <circle cx="92" cy="412" r="9" fill="#101b2d" stroke="#00ff8c" stroke-width="1.5"/>
+  <path d="M88,412 L91,415 L97,408" stroke="#00ff8c" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="112" y="418" font-family="Arial, sans-serif" font-size="20" fill="#00ff8c">SHAP Explainability</text>
+
+  <circle cx="92" cy="452" r="9" fill="#101b2d" stroke="#00ff8c" stroke-width="1.5"/>
+  <path d="M88,452 L91,455 L97,448" stroke="#00ff8c" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="112" y="458" font-family="Arial, sans-serif" font-size="20" fill="#00ff8c">NEWS2 · SOFA · qSOFA · APACHE II</text>
+
+  <circle cx="92" cy="492" r="9" fill="#101b2d" stroke="#00ff8c" stroke-width="1.5"/>
+  <path d="M88,492 L91,495 L97,488" stroke="#00ff8c" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="112" y="498" font-family="Arial, sans-serif" font-size="20" fill="#00ff8c">Real-time Risk Prediction</text>
+
+  <text x="80" y="570" font-family="monospace" font-size="18" fill="#475569">biosignal-puce.vercel.app</text>
+
+  <!-- Risk badge decoration -->
+  <rect x="950" y="190" width="170" height="60" rx="30" fill="#ff475712" stroke="#ff475740" stroke-width="1"/>
+  <circle cx="975" cy="220" r="5" fill="#ff4757"/>
+  <text x="990" y="225" font-family="monospace" font-size="14" font-weight="600" fill="#ff4757">HIGH RISK</text>
+  <text x="1035" y="225" font-family="monospace" font-size="14" fill="#ff4757"></text>
+  <text x="975" y="240" font-family="monospace" font-size="12" fill="#64748b"></text>
 </svg>
