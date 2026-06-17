@@ -8,6 +8,7 @@
 [![Backend API](https://img.shields.io/badge/API-Render-46E3B7?style=for-the-badge&logo=render)](https://biosignal-api.onrender.com)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Dataset](https://img.shields.io/badge/Dataset-MIMIC--IV-red?style=for-the-badge)](https://physionet.org/content/mimiciv/)
+[![UI](https://img.shields.io/badge/UI-v2.0%20Medical%20Grade-8b5cf6?style=for-the-badge)](https://biosignal-puce.vercel.app)
 
 *Predicting ICU patient deterioration before it becomes critical — because every second counts.*
 
@@ -19,24 +20,52 @@
 
 BioSignal is a production-grade clinical decision support tool that analyzes real-time patient vitals and predicts the risk of ICU deterioration using machine learning trained on **MIMIC-IV** — the world's most prestigious real ICU patient dataset.
 
-Built to demonstrate how ML can assist ICU clinicians in identifying high-risk patients early, before deterioration becomes irreversible.
+Built to demonstrate how ML can assist ICU clinicians in identifying high-risk patients early, before deterioration becomes irreversible. The interface follows a custom medical-grade design system inspired by real ICU monitoring equipment.
 
 > ⚠️ **Disclaimer:** This is a research portfolio project, not a certified medical device. Not intended for clinical use.
 
 ---
 
+## 🎨 v2.0 — Medical-Grade UI Upgrade
+
+The frontend was rebuilt with a dedicated design system rather than default Tailwind styling:
+
+- **Custom color tokens** — deep navy backgrounds, cyan/green/amber/red semantic risk colors, purple for ML/AI elements
+- **Typography system** — Outfit (display), DM Sans (body), IBM Plex Mono (clinical data/numbers)
+- **Animated SVG risk gauge** — glowing arc with tick marks, dynamic color by risk level
+- **Micro-interactions** — pulsing critical alerts, animated score counters, hover states on patient cards
+- **Custom Recharts theming** — dark-mode tooltips, reference lines, staggered line animations
+- **QA-tested with Gemini CLI + Playwright MCP** across desktop/tablet/mobile — scored **9/10** overall, **8.5/10** design
+
+---
+
 ## ✨ Features
 
+### Clinical Scoring Modules (12)
+| Module | Description |
+|---|---|
+| 🔴 **ML Risk Prediction** | LightGBM model predicts deterioration risk (next 6h) with SHAP explainability |
+| 📋 **NEWS2** | National Early Warning Score 2 — NHS standard deterioration screening |
+| ❤️ **SOFA** | Sequential Organ Failure Assessment — 6 organ systems, mortality estimate |
+| 🚨 **Sepsis Detector** | qSOFA + SIRS criteria with septic shock detection |
+| 📊 **APACHE II** | Acute Physiology and Chronic Health Evaluation — full clinical calculator |
+| 🗺️ **Patient Heatmap** | Risk-colored grid view across all patients |
+| ⏱️ **Patient Timeline** | Chronological event log with intervention tracking |
+| 💧 **Fluid Balance** | Intake/output tracking with running net balance |
+| 📝 **Shift Report** | Auto-generated ICU handover report, downloadable |
+| 📈 **Model Stats** | ROC curve, feature importance, precision/recall metrics |
+| 📤 **Export** | CSV/JSON export of patient data + predictions |
+| 🔬 **Report Analyzer** | Manual entry or CSV upload → auto-computes ML risk + NEWS2 + qSOFA + MAP for *any* patient, not just the 4 demo profiles, with a full downloadable clinical report |
+
+### Platform Features
 | Feature | Description |
 |---|---|
-| 🔴 **Live Risk Prediction** | ML model predicts patient deterioration risk in real time |
-| 📊 **ML Dashboard** | Visual risk gauges, patient cards, vitals timeline |
-| 📋 **Report Analyzer** | Upload ICU reports — AI extracts vitals and predicts risk |
-| 🌐 **21-Language Support** | English + 10 Indian + 10 world languages |
+| 🌐 **21-Language Support** | English + 10 Indian + 10 world languages, IP-based auto-detection |
 | 📱 **PWA Ready** | Installable on mobile, works offline |
-| 💓 **ECG Entry Animation** | Animated ECG draw on load (2.5s) |
-| 🔔 **Backend KeepAlive** | Auto-ping every 10 min — backend always warm |
-| 🔗 **OG Meta Tags** | Rich LinkedIn/Twitter preview cards |
+| 💓 **ECG Entry Animation** | Animated ECG draw on load |
+| 🔔 **Backend KeepAlive** | Auto-ping every 10 min + UptimeRobot monitoring — backend always warm |
+| 🔗 **OG Meta Tags** | Rich LinkedIn/Twitter preview cards with custom SVG |
+| 📲 **Fully Responsive** | Horizontal-scroll tab nav and stacked layouts tested down to 390px |
 
 ---
 
@@ -45,20 +74,25 @@ Built to demonstrate how ML can assist ICU clinicians in identifying high-risk p
 ### Frontend
 - **Next.js 16** (App Router, Turbopack)
 - **TypeScript** — full type safety
-- **Tailwind CSS** — utility-first styling
+- **Tailwind CSS v4** — utility-first styling + custom design tokens
+- **Recharts** — data visualization (line charts, radial gauges, bar charts)
+- **Framer Motion** — animations and transitions
 - **Lucide React** — icon system
+- **Google Fonts** — Outfit, DM Sans, IBM Plex Mono
 - **PWA** — manifest + service worker
 
 ### Backend
 - **Python** + **FastAPI**
-- **scikit-learn** — ML model (Random Forest / Gradient Boosting)
+- **LightGBM** — gradient-boosted ML model
+- **SHAP** — model explainability
 - **MIMIC-IV** dataset — real ICU patient data (PhysioNet)
 - **Render** — cloud deployment
 
-### DevOps
+### DevOps & QA
 - **Vercel** — frontend hosting + auto-deploy on push
 - **GitHub** — version control
 - **Render** — backend hosting
+- **Gemini CLI + Playwright MCP** — automated cross-device QA testing and live deployment audits
 
 ---
 
@@ -70,6 +104,7 @@ This project uses **MIMIC-IV** (Medical Information Mart for Intensive Care), th
 - 🏥 ~300,000 ICU admissions from Beth Israel Deaconess Medical Center
 - 🔐 Access requires free registration + CITI ethics training
 - 📈 Features: heart rate, SpO2, blood pressure, respiratory rate, temperature, GCS score
+- 🔢 11,021 engineered training windows, ROC-AUC 0.71
 
 ---
 
@@ -104,13 +139,16 @@ API runs at [http://localhost:8000](http://localhost:8000)
 ---
 
 ## 📁 Project Structure
+
+```
 biosignal/
 ├── frontend/                  # Next.js app
 │   ├── app/
-│   │   ├── components/        # UI components
+│   │   ├── components/        # 16 UI components (design-system based)
 │   │   ├── lib/
 │   │   │   ├── api.ts
 │   │   │   └── risk-utils.ts
+│   │   ├── globals.css        # Design tokens (colors, fonts, animations)
 │   │   ├── page.tsx
 │   │   └── layout.tsx
 │   └── public/
@@ -119,6 +157,7 @@ biosignal/
 │   └── requirements.txt
 ├── vercel.json
 └── render.yaml
+```
 
 ---
 
