@@ -24,6 +24,7 @@
   --warning-border:  rgba(255,184,0,0.22);
   --critical-border: rgba(255,71,87,0.22);
   --ml-border:       rgba(139,92,246,0.22);
+  --text-primary:   #e2e8f0;
   --text-secondary: #94a3b8;
   --text-muted:     #475569;
   --border-subtle:  rgba(56,130,210,0.10);
@@ -89,6 +90,6 @@ body { background: var(--background); color: var(--foreground); font-family: var
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Mobile tab scroll */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
