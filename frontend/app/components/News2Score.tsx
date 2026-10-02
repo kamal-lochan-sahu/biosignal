@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
+import { calculateNews2, NEWS2_LABELS, type News2Level } from '@/lib/scores'
 
-// ── Types & Logic (unchanged) ─────────────────────────────────────────────
+// -- Adapter: UI state -> shared, verified scoring module (lib/scores) ----------
 interface News2Input {
   respiratory_rate: number; spo2: number; on_oxygen: boolean
   bp_systolic: number; heart_rate: number; temperature: number
@@ -9,67 +10,34 @@ interface News2Input {
 }
 interface ScoreBreakdown { name: string; value: string; score: number; max: number }
 
-function calcNews2(v: News2Input): { total: number; breakdown: ScoreBreakdown[] } {
-  let rr = 0
-  if (v.respiratory_rate < 12) rr = 3
-  else if (v.respiratory_rate <= 20) rr = 0
-  else if (v.respiratory_rate <= 24) rr = 2
-  else rr = 3
-
-  let spo2Score = 0
-  if (v.spo2 <= 83) spo2Score = 3
-  else if (v.spo2 <= 85) spo2Score = 2
-  else if (v.spo2 <= 87) spo2Score = 1
-  else if (v.spo2 <= 92) spo2Score = 0
-  else if (v.spo2 <= 94) spo2Score = v.on_oxygen ? 1 : 0
-  else if (v.spo2 <= 96) spo2Score = v.on_oxygen ? 2 : 0
-  else spo2Score = v.on_oxygen ? 3 : 0
-
-  const o2 = v.on_oxygen ? 2 : 0
-
-  let sbp = 0
-  if (v.bp_systolic <= 90) sbp = 3
-  else if (v.bp_systolic <= 100) sbp = 2
-  else if (v.bp_systolic <= 110) sbp = 1
-  else if (v.bp_systolic <= 219) sbp = 0
-  else sbp = 3
-
-  let hr = 0
-  if (v.heart_rate <= 40) hr = 3
-  else if (v.heart_rate <= 50) hr = 1
-  else if (v.heart_rate <= 90) hr = 0
-  else if (v.heart_rate <= 110) hr = 1
-  else if (v.heart_rate <= 130) hr = 2
-  else hr = 3
-
-  let temp = 0
-  if (v.temperature <= 35.0) temp = 3
-  else if (v.temperature <= 36.0) temp = 1
-  else if (v.temperature <= 38.0) temp = 0
-  else if (v.temperature <= 39.0) temp = 1
-  else temp = 2
-
-  const consciousness = v.consciousness === 'confused' ? 3 : 0
-  const total = rr + spo2Score + o2 + sbp + hr + temp + consciousness
+function calcNews2(v: News2Input): { total: number; level: News2Level; response: string; breakdown: ScoreBreakdown[] } {
+  const r = calculateNews2({
+    respiratoryRate: v.respiratory_rate,
+    spo2: v.spo2,
+    onOxygen: v.on_oxygen,
+    systolicBp: v.bp_systolic,
+    heartRate: v.heart_rate,
+    temperature: v.temperature,
+    consciousness: v.consciousness === 'alert' ? 'alert' : 'cvpu',
+  })
   return {
-    total,
-    breakdown: [
-      { name: 'Respiratory Rate', value: `${v.respiratory_rate}/min`, score: rr,           max: 3 },
-      { name: 'SpO₂',             value: `${v.spo2}%`,               score: spo2Score,     max: 3 },
-      { name: 'Supplemental O₂',  value: v.on_oxygen ? 'Yes' : 'No', score: o2,            max: 2 },
-      { name: 'BP Systolic',       value: `${v.bp_systolic} mmHg`,   score: sbp,           max: 3 },
-      { name: 'Heart Rate',        value: `${v.heart_rate} bpm`,     score: hr,            max: 3 },
-      { name: 'Temperature',       value: `${v.temperature}°C`,      score: temp,          max: 2 },
-      { name: 'Consciousness',     value: v.consciousness === 'alert' ? 'Alert' : 'CVPU', score: consciousness, max: 3 },
-    ]
+    total: r.total,
+    level: r.level,
+    response: r.response,
+    breakdown: r.parameters.map(p => ({ name: p.label, value: p.display, score: p.score, max: p.max })),
   }
 }
 
-function getRiskLevel(total: number) {
-  if (total >= 7) return { label: 'HIGH RISK',   color: 'var(--clr-critical)', dim: 'var(--critical-dim)', border: 'var(--critical-border)', response: 'Continuous monitoring — Urgent clinical review' }
-  if (total >= 5) return { label: 'MEDIUM RISK', color: 'var(--clr-warning)',  dim: 'var(--warning-dim)',  border: 'var(--warning-border)',  response: 'Increase frequency of monitoring' }
-  if (total >= 1) return { label: 'LOW RISK',    color: 'var(--clr-success)',  dim: 'var(--success-dim)',  border: 'var(--success-border)',  response: 'Routine monitoring' }
-  return           { label: 'NORMAL',            color: 'var(--clr-success)',  dim: 'var(--success-dim)',  border: 'var(--success-border)',  response: 'Routine monitoring' }
+type LevelColors = { color: string; dim: string; border: string }
+const OK:   LevelColors = { color: 'var(--clr-success)',  dim: 'var(--success-dim)',  border: 'var(--success-border)'  }
+const WARN: LevelColors = { color: 'var(--clr-warning)',  dim: 'var(--warning-dim)',  border: 'var(--warning-border)'  }
+const CRIT: LevelColors = { color: 'var(--clr-critical)', dim: 'var(--critical-dim)', border: 'var(--critical-border)' }
+const LEVEL_COLORS: Record<News2Level, LevelColors> = {
+  NORMAL: OK, LOW: OK, LOW_MEDIUM: WARN, MEDIUM: WARN, HIGH: CRIT,
+}
+
+function getRiskLevel(level: News2Level, response: string) {
+  return { label: NEWS2_LABELS[level], response, ...LEVEL_COLORS[level] }
 }
 
 function getBarColor(score: number) {
@@ -94,8 +62,8 @@ export default function News2Score({ initialVitals }: Props) {
     consciousness:    'alert',
   })
 
-  const { total, breakdown } = calcNews2(vitals)
-  const risk = getRiskLevel(total)
+  const { total, breakdown, level, response } = calcNews2(vitals)
+  const risk = getRiskLevel(level, response)
   const update = (key: keyof News2Input, value: number | boolean | string) =>
     setVitals(prev => ({ ...prev, [key]: value }))
 

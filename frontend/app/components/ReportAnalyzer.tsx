@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react'
 import { Upload, FileText, Activity, AlertTriangle, CheckCircle, Loader, Download } from 'lucide-react'
 import { predictRisk } from '@/lib/api'
+import { calculateNews2, calculateQsofa, calculateMap, NEWS2_SHORT, QSOFA_LABELS } from '@/lib/scores'
 
 interface VitalsData {
   heart_rate: number; spo2: number; bp_systolic: number; bp_diastolic: number
@@ -24,67 +25,21 @@ interface AnalysisResult {
   clinical: ClinicalScores
 }
 
-// ── Clinical Score Calculators ─────────────────────────────────────────────
-function calcNEWS2(v: VitalsData): { score: number; risk: string } {
-  let rr = 0
-  if (v.respiratory_rate < 12) rr = 3
-  else if (v.respiratory_rate <= 20) rr = 0
-  else if (v.respiratory_rate <= 24) rr = 2
-  else rr = 3
-
-  let spo2 = 0
-  if (v.spo2 <= 83) spo2 = 3
-  else if (v.spo2 <= 85) spo2 = 2
-  else if (v.spo2 <= 87) spo2 = 1
-  else if (v.spo2 <= 92) spo2 = 0
-  else if (v.spo2 <= 94) spo2 = 0
-  else if (v.spo2 <= 96) spo2 = 0
-
-  let sbp = 0
-  if (v.bp_systolic <= 90) sbp = 3
-  else if (v.bp_systolic <= 100) sbp = 2
-  else if (v.bp_systolic <= 110) sbp = 1
-  else if (v.bp_systolic <= 219) sbp = 0
-  else sbp = 3
-
-  let hr = 0
-  if (v.heart_rate <= 40) hr = 3
-  else if (v.heart_rate <= 50) hr = 1
-  else if (v.heart_rate <= 90) hr = 0
-  else if (v.heart_rate <= 110) hr = 1
-  else if (v.heart_rate <= 130) hr = 2
-  else hr = 3
-
-  let temp = 0
-  if (v.temperature <= 35.0) temp = 3
-  else if (v.temperature <= 36.0) temp = 1
-  else if (v.temperature <= 38.0) temp = 0
-  else if (v.temperature <= 39.0) temp = 1
-  else temp = 2
-
-  const total = rr + spo2 + sbp + hr + temp
-  const risk = total >= 7 ? 'HIGH' : total >= 5 ? 'MEDIUM' : total >= 1 ? 'LOW' : 'NORMAL'
-  return { score: total, risk }
-}
-
-function calcQSOFA(v: VitalsData): { score: number; risk: string } {
-  let score = 0
-  if (v.respiratory_rate >= 22) score++
-  if (v.bp_systolic <= 100) score++
-  if ((v.gcs ?? 15) < 15) score++
-  return { score, risk: score >= 2 ? 'SEPSIS RISK' : score === 1 ? 'WATCH' : 'LOW' }
-}
-
-function calcMAP(sbp: number, dbp: number): { map: number; status: string } {
-  const map = Math.round((sbp + 2 * dbp) / 3)
-  const status = map < 65 ? 'CRITICAL' : map < 70 ? 'LOW' : map < 100 ? 'NORMAL' : 'ELEVATED'
-  return { map, status }
-}
-
+// -- Clinical scores: shared, verified module (lib/scores) --------------------
+// Report Analyzer has no oxygen / consciousness inputs yet, so room air is assumed
+// and GCS < 15 is treated as altered consciousness (CVPU).
 function calcClinical(v: VitalsData): ClinicalScores {
-  const news2 = calcNEWS2(v)
-  const qsofa = calcQSOFA(v)
-  const mapCalc = calcMAP(v.bp_systolic, v.bp_diastolic)
+  const news2 = calculateNews2({
+    respiratoryRate: v.respiratory_rate,
+    spo2: v.spo2,
+    onOxygen: false,
+    systolicBp: v.bp_systolic,
+    heartRate: v.heart_rate,
+    temperature: v.temperature,
+    consciousness: (v.gcs ?? 15) < 15 ? 'cvpu' : 'alert',
+  })
+  const qsofa = calculateQsofa({ respiratoryRate: v.respiratory_rate, systolicBp: v.bp_systolic, gcs: v.gcs })
+  const mapCalc = calculateMap(v.bp_systolic, v.bp_diastolic)
   const issues: string[] = []
   if (v.heart_rate > 100) issues.push(`Tachycardia: ${v.heart_rate} bpm`)
   if (v.heart_rate < 50)  issues.push(`Bradycardia: ${v.heart_rate} bpm`)
@@ -95,8 +50,8 @@ function calcClinical(v: VitalsData): ClinicalScores {
   if (v.temperature < 36)      issues.push(`Hypothermia: ${v.temperature}°C`)
   if (mapCalc.map < 65)        issues.push(`Low MAP: ${mapCalc.map} mmHg`)
   return {
-    news2: news2.score, news2_risk: news2.risk,
-    qsofa: qsofa.score, sepsis_risk: qsofa.risk,
+    news2: news2.total, news2_risk: NEWS2_SHORT[news2.level],
+    qsofa: qsofa.score, sepsis_risk: QSOFA_LABELS[qsofa.level],
     map: mapCalc.map, map_status: mapCalc.status,
     issues,
   }
