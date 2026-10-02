@@ -2,201 +2,139 @@
 
 <div align="center">
 
-**Early Warning System powered by Machine Learning**
+**Early-warning dashboard with a machine-learning risk model**
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-biosignal--puce.vercel.app-blue?style=for-the-badge&logo=vercel)](https://biosignal-puce.vercel.app)
 [![Backend API](https://img.shields.io/badge/API-Render-46E3B7?style=for-the-badge&logo=render)](https://biosignal-api.onrender.com)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-[![Dataset](https://img.shields.io/badge/Dataset-MIMIC--IV-red?style=for-the-badge)](https://physionet.org/content/mimiciv/)
-[![UI](https://img.shields.io/badge/UI-v2.0%20Medical%20Grade-8b5cf6?style=for-the-badge)](https://biosignal-puce.vercel.app)
-
-*Predicting ICU patient deterioration before it becomes critical — because every second counts.*
+[![Dataset](https://img.shields.io/badge/Dataset-MIMIC--IV%20Demo-red?style=for-the-badge)](https://physionet.org/content/mimic-iv-demo/2.2/)
 
 </div>
 
 ---
 
-## 🧠 What is BioSignal?
+## What is BioSignal?
 
-BioSignal is a production-grade clinical decision support tool that analyzes real-time patient vitals and predicts the risk of ICU deterioration using machine learning trained on **MIMIC-IV** — the world's most prestigious real ICU patient dataset.
+BioSignal is a research / portfolio prototype that shows how vital-sign data can be turned into an early-warning view for ICU patients. A LightGBM model predicts the risk of deterioration from vital-sign statistics, SHAP explains each prediction, and the dashboard adds common bedside scores (NEWS2, qSOFA, SOFA, APACHE II) next to it.
 
-Built to demonstrate how ML can assist ICU clinicians in identifying high-risk patients early, before deterioration becomes irreversible. The interface follows a custom medical-grade design system inspired by real ICU monitoring equipment.
-
-> ⚠️ **Disclaimer:** This is a research portfolio project, not a certified medical device. Not intended for clinical use.
+> ⚠️ **Disclaimer:** This is **not a medical device** and is **not intended for clinical use**. The model is trained on a small public demo dataset, several screens use simulated data, and the clinical scores are simplified implementations. Never use it to make decisions about real patients.
 
 ---
 
-## 🎨 v2.0 — Medical-Grade UI Upgrade
+## Features
 
-The frontend was rebuilt with a dedicated design system rather than default Tailwind styling:
-
-- **Custom color tokens** — deep navy backgrounds, cyan/green/amber/red semantic risk colors, purple for ML/AI elements
-- **Typography system** — Outfit (display), DM Sans (body), IBM Plex Mono (clinical data/numbers)
-- **Animated SVG risk gauge** — glowing arc with tick marks, dynamic color by risk level
-- **Micro-interactions** — pulsing critical alerts, animated score counters, hover states on patient cards
-- **Custom Recharts theming** — dark-mode tooltips, reference lines, staggered line animations
-- **QA-tested with Gemini CLI + Playwright MCP** across desktop/tablet/mobile — scored **9/10** overall, **8.5/10** design
-
----
-
-## ✨ Features
-
-### Clinical Scoring Modules (12)
 | Module | Description |
 |---|---|
-| 🔴 **ML Risk Prediction** | LightGBM model predicts deterioration risk (next 6h) with SHAP explainability |
-| 📋 **NEWS2** | National Early Warning Score 2 — NHS standard deterioration screening |
-| ❤️ **SOFA** | Sequential Organ Failure Assessment — 6 organ systems, mortality estimate |
-| 🚨 **Sepsis Detector** | qSOFA + SIRS criteria with septic shock detection |
-| 📊 **APACHE II** | Acute Physiology and Chronic Health Evaluation — full clinical calculator |
-| 🗺️ **Patient Heatmap** | Risk-colored grid view across all patients |
-| ⏱️ **Patient Timeline** | Chronological event log with intervention tracking |
-| 💧 **Fluid Balance** | Intake/output tracking with running net balance |
-| 📝 **Shift Report** | Auto-generated ICU handover report, downloadable |
-| 📈 **Model Stats** | ROC curve, feature importance, precision/recall metrics |
-| 📤 **Export** | CSV/JSON export of patient data + predictions |
-| 🔬 **Report Analyzer** | Manual entry or CSV upload → auto-computes ML risk + NEWS2 + qSOFA + MAP for *any* patient, not just the 4 demo profiles, with a full downloadable clinical report |
-
-### Platform Features
-| Feature | Description |
-|---|---|
-| 🌐 **21-Language Support** | English + 10 Indian + 10 world languages, IP-based auto-detection |
-| 📱 **PWA Ready** | Installable on mobile, works offline |
-| 💓 **ECG Entry Animation** | Animated ECG draw on load |
-| 🔔 **Backend KeepAlive** | Auto-ping every 10 min + UptimeRobot monitoring — backend always warm |
-| 🔗 **OG Meta Tags** | Rich LinkedIn/Twitter preview cards with custom SVG |
-| 📲 **Fully Responsive** | Horizontal-scroll tab nav and stacked layouts tested down to 390px |
+| **ML Risk Prediction** | LightGBM risk score with SHAP explanation (FastAPI `/predict`) |
+| **NEWS2 / SOFA / APACHE II** | Client-side score calculators (simplified, see limitations) |
+| **Sepsis screen** | qSOFA + SIRS criteria |
+| **Patient heatmap / cards** | Risk-coloured overview of the 4 demo patients |
+| **Report Analyzer** | Manual entry or CSV upload → ML risk + NEWS2 + qSOFA + MAP, downloadable report |
+| **Shift report / Export** | Handover text and CSV/JSON export |
+| **Model stats** | Metrics, ROC curve and feature importance (static values, see limitations) |
+| **Platform** | 21 UI languages, installable PWA manifest, responsive layout, backend keep-alive ping |
 
 ---
 
-## 🏗️ Tech Stack
+## Tech stack
 
-### Frontend
-- **Next.js 16** (App Router, Turbopack)
-- **TypeScript** — full type safety
-- **Tailwind CSS v4** — utility-first styling + custom design tokens
-- **Recharts** — data visualization (line charts, radial gauges, bar charts)
-- **Framer Motion** — animations and transitions
-- **Lucide React** — icon system
-- **Google Fonts** — Outfit, DM Sans, IBM Plex Mono
-- **PWA** — manifest + service worker
-
-### Backend
-- **Python** + **FastAPI**
-- **LightGBM** — gradient-boosted ML model
-- **SHAP** — model explainability
-- **MIMIC-IV** dataset — real ICU patient data (PhysioNet)
-- **Render** — cloud deployment
-
-### DevOps & QA
-- **Vercel** — frontend hosting + auto-deploy on push
-- **GitHub** — version control
-- **Render** — backend hosting
-- **Gemini CLI + Playwright MCP** — automated cross-device QA testing and live deployment audits
+- **Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Recharts, Framer Motion
+- **Backend:** Python, FastAPI, LightGBM, SHAP, scikit-learn, pandas
+- **Hosting:** Vercel (frontend), Render (backend)
 
 ---
 
-## 📊 Dataset — MIMIC-IV
+## Data and model
 
-This project uses **MIMIC-IV** (Medical Information Mart for Intensive Care), the gold standard real-world ICU dataset:
+- **Dataset:** [MIMIC-IV Clinical Database Demo v2.2](https://physionet.org/content/mimic-iv-demo/2.2/) — an openly available subset of **100 patients** (the full MIMIC-IV needs credentialed access and is not used). Licensed under the [ODbL v1.0](https://opendatacommons.org/licenses/odbl/1-0/). Please cite PhysioNet and MIMIC-IV when you reuse it.
+- **Features (20):** mean / std / min / max of heart rate, SpO₂, systolic BP, diastolic BP and respiratory rate over a window.
+- **Training windows:** 11,021 engineered windows (8,816 train / remainder test). Reported ROC-AUC: **0.71**.
+- The data is not stored in this repository. Download it with:
 
-- 📍 Hosted on [PhysioNet](https://physionet.org/content/mimiciv/)
-- 🏥 ~300,000 ICU admissions from Beth Israel Deaconess Medical Center
-- 🔐 Access requires free registration + CITI ethics training
-- 📈 Features: heart rate, SpO2, blood pressure, respiratory rate, temperature, GCS score
-- 🔢 11,021 engineered training windows, ROC-AUC 0.71
+```bash
+./scripts/download_mimic_demo.sh
+```
 
 ---
 
-## 🚀 Getting Started
+## Getting started
 
-### Prerequisites
-- Node.js v20+
-- Python 3.12+
-- npm
-
-### Frontend (Local)
+**Prerequisites:** Node.js 20+, Python 3.11+ (3.11 is used in deployment), npm.
 
 ```bash
 git clone https://github.com/kamal-lochan-sahu/biosignal.git
-cd biosignal/frontend
-npm install
-npm run dev
+cd biosignal
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
-
-### Backend (Local)
+**Backend** (http://localhost:8000):
 
 ```bash
-cd biosignal/backend
+cd backend
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-API runs at [http://localhost:8000](http://localhost:8000)
+**Frontend** (http://localhost:3000):
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ---
 
-## 📁 Project Structure
+## Project structure
 
 ```
 biosignal/
-├── frontend/                  # Next.js app
+├── frontend/              # Next.js app
 │   ├── app/
-│   │   ├── components/        # 16 UI components (design-system based)
-│   │   ├── lib/
-│   │   │   ├── api.ts
-│   │   │   └── risk-utils.ts
-│   │   ├── globals.css        # Design tokens (colors, fonts, animations)
-│   │   ├── page.tsx
-│   │   └── layout.tsx
+│   │   ├── components/    # 19 UI components
+│   │   ├── globals.css    # design tokens and animations
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── lib/               # api client, risk helpers
 │   └── public/
-├── backend/                   # FastAPI + ML model
+├── backend/               # FastAPI service
 │   ├── main.py
+│   ├── models/            # trained LightGBM model + feature list
+│   ├── ml/  data/         # training / preprocessing (placeholders, work in progress)
 │   └── requirements.txt
-├── vercel.json
-└── render.yaml
+├── scripts/               # helper scripts (data download)
+├── render.yaml
+└── vercel.json
 ```
 
 ---
 
-## 🌐 Live Deployment
+## Known limitations
 
-| Service | URL | Status |
-|---|---|---|
-| Frontend | [biosignal-puce.vercel.app](https://biosignal-puce.vercel.app) | ✅ Live |
-| Backend API | [biosignal-api.onrender.com](https://biosignal-api.onrender.com) | ✅ Live |
+- Trained on 100 demo patients only; ROC-AUC 0.71 is modest and not clinically validated.
+- Training code is not yet part of the repository (`backend/ml/` is a placeholder), so the model cannot be reproduced from source yet.
+- Model-stats charts use hard-coded values, the patient timeline is templated and the vitals chart is simulated.
+- Report Analyzer derives std/min/max from a single reading, so its ML output is only indicative.
+- NEWS2, SOFA and APACHE II are simplified and not yet verified against the reference definitions.
+- No authentication, rate limiting or automated tests yet.
 
----
-
-## 🌍 Supported Languages
-
-**Indian:** Hindi, Bengali, Telugu, Marathi, Tamil, Gujarati, Kannada, Malayalam, Odia, Punjabi
-
-**World:** Spanish, French, German, Japanese, Chinese, Arabic, Portuguese, Russian, Korean, Italian
+These items are tracked as the next engineering steps.
 
 ---
 
-## 👤 Author
+## Live deployment
 
-**Kamal Lochan Sahu**
-- 📍 Berhampur, Odisha, India
-- 🎯 Goal: IT/Robotics Ausbildung in Germany 🇩🇪
-- 🐙 GitHub: [@kamal-lochan-sahu](https://github.com/kamal-lochan-sahu)
+| Service | URL |
+|---|---|
+| Frontend | [biosignal-puce.vercel.app](https://biosignal-puce.vercel.app) |
+| Backend API | [biosignal-api.onrender.com](https://biosignal-api.onrender.com) (free tier, may need a moment to wake up) |
 
 ---
 
-## 📄 License
+## Author
+
+**Kamal Lochan Sahu** · GitHub: [@kamal-lochan-sahu](https://github.com/kamal-lochan-sahu)
+
+## License
 
 [MIT](LICENSE) © 2025 Kamal Lochan Sahu
-
----
-
-<div align="center">
-
-*Built with ❤️ as part of a production-grade ML portfolio*
-
-**⭐ Star this repo if you find it useful!**
-
-</div>
