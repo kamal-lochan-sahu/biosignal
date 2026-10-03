@@ -1,3 +1,5 @@
 export * from './news2'
 export * from './qsofa'
 export * from './map'
+export * from './sofa'
+export * from './apache2'
