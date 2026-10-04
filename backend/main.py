@@ -1,101 +1,88 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import joblib
+"""BioSignal API - ICU deterioration risk prediction.
+
+Research / demo project, not a medical device and not intended for clinical use.
+"""
 import json
+import os
+from pathlib import Path
+
+import joblib
 import numpy as np
 import pandas as pd
 import shap
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="BioSignal API")
+from risk import risk_level_for
+from schemas import FEATURE_COLUMNS, PredictionResponse, TopFactor, VitalsInput, to_feature_row
+
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "models" / "biosignal_model.pkl"
+FEATURES_PATH = BASE_DIR / "models" / "feature_cols.json"
+
+# Comma-separated list in the CORS_ORIGINS environment variable overrides these defaults.
+DEFAULT_CORS_ORIGINS = "https://biosignal-puce.vercel.app,http://localhost:3000,http://127.0.0.1:3000"
+TOP_FACTOR_COUNT = 5
+
+
+def allowed_origins() -> list[str]:
+    raw = os.getenv("CORS_ORIGINS", DEFAULT_CORS_ORIGINS)
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
+
+app = FastAPI(
+    title="BioSignal API",
+    version="0.2.0",
+    description="ICU patient deterioration risk. Research / demo only - not a medical device.",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins(),
+    allow_methods=["GET", "HEAD", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"],
+)
+
+# --- Model (loaded once at start-up; paths do not depend on the working directory) ---
+model = joblib.load(MODEL_PATH)
+feature_cols: list[str] = json.loads(FEATURES_PATH.read_text(encoding="utf-8"))
+if sorted(feature_cols) != sorted(FEATURE_COLUMNS):
+    raise RuntimeError("models/feature_cols.json does not match the features defined in schemas.py")
+explainer = shap.TreeExplainer(model)
+
+
+def positive_class_contributions(shap_values) -> list[float]:
+    """First row of SHAP values for the positive class, across shap versions
+    (list per class, 2-D array, or 3-D array [rows, features, classes])."""
+    if isinstance(shap_values, list):
+        shap_values = shap_values[1]
+    values = np.asarray(shap_values)
+    if values.ndim == 3:
+        values = values[:, :, 1]
+    return values[0].tolist()
+
+
+@app.get("/")
+def root():
+    return {"status": "BioSignal API running"}
+
 
 @app.get("/health")
 @app.head("/health")
 def health_check():
     return {"status": "ok"}
 
-# CORS — frontend se connect hone ke liye
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-# Model load karo
-model = joblib.load("models/biosignal_model.pkl")
-with open("models/feature_cols.json") as f:
-    feature_cols = json.load(f)
+@app.post("/predict", response_model=PredictionResponse)
+def predict(vitals: VitalsInput) -> PredictionResponse:
+    frame = pd.DataFrame([to_feature_row(vitals)], columns=feature_cols)
 
-explainer = shap.TreeExplainer(model)
+    score = round(float(model.predict_proba(frame)[0][1]), 4)
+    contributions = dict(zip(feature_cols, positive_class_contributions(explainer.shap_values(frame))))
+    top = sorted(contributions.items(), key=lambda item: abs(item[1]), reverse=True)[:TOP_FACTOR_COUNT]
 
-# Input schema
-class VitalsInput(BaseModel):
-    heart_rate_mean: float
-    heart_rate_std: float
-    heart_rate_min: float
-    heart_rate_max: float
-    spo2_mean: float
-    spo2_std: float
-    spo2_min: float
-    spo2_max: float
-    bp_systolic_mean: float
-    bp_systolic_std: float
-    bp_systolic_min: float
-    bp_systolic_max: float
-    bp_diastolic_mean: float
-    bp_diastolic_std: float
-    bp_diastolic_min: float
-    bp_diastolic_max: float
-    respiratory_rate_mean: float
-    respiratory_rate_std: float
-    respiratory_rate_min: float
-    respiratory_rate_max: float
-
-@app.get("/")
-def root():
-    return {"status": "BioSignal API running"}
-
-@app.post("/predict")
-def predict(vitals: VitalsInput):
-    # Input DataFrame banao
-    input_data = pd.DataFrame([{
-        "Heart Rate_mean": vitals.heart_rate_mean,
-        "Heart Rate_std": vitals.heart_rate_std,
-        "Heart Rate_min": vitals.heart_rate_min,
-        "Heart Rate_max": vitals.heart_rate_max,
-        "SpO2_mean": vitals.spo2_mean,
-        "SpO2_std": vitals.spo2_std,
-        "SpO2_min": vitals.spo2_min,
-        "SpO2_max": vitals.spo2_max,
-        "BP Systolic_mean": vitals.bp_systolic_mean,
-        "BP Systolic_std": vitals.bp_systolic_std,
-        "BP Systolic_min": vitals.bp_systolic_min,
-        "BP Systolic_max": vitals.bp_systolic_max,
-        "BP Diastolic_mean": vitals.bp_diastolic_mean,
-        "BP Diastolic_std": vitals.bp_diastolic_std,
-        "BP Diastolic_min": vitals.bp_diastolic_min,
-        "BP Diastolic_max": vitals.bp_diastolic_max,
-        "Respiratory Rate_mean": vitals.respiratory_rate_mean,
-        "Respiratory Rate_std": vitals.respiratory_rate_std,
-        "Respiratory Rate_min": vitals.respiratory_rate_min,
-        "Respiratory Rate_max": vitals.respiratory_rate_max,
-    }])
-
-    # Prediction
-    prob = model.predict_proba(input_data)[0][1]
-    risk_level = "HIGH" if prob > 0.7 else "MEDIUM" if prob > 0.4 else "LOW"
-
-    # SHAP values
-    shap_vals = explainer.shap_values(input_data)
-    if isinstance(shap_vals, list):
-        shap_vals = shap_vals[1]
-    
-    shap_dict = dict(zip(feature_cols, shap_vals[0].tolist()))
-    top_factors = sorted(shap_dict.items(), key=lambda x: abs(x[1]), reverse=True)[:5]
-
-    return {
-        "risk_score": round(float(prob), 4),
-        "risk_level": risk_level,
-        "top_factors": [{"feature": k, "impact": round(v, 4)} for k, v in top_factors]
-    }
+    return PredictionResponse(
+        risk_score=score,
+        risk_level=risk_level_for(score),
+        top_factors=[TopFactor(feature=name, impact=round(value, 4)) for name, value in top],
+    )

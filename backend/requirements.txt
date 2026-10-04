@@ -1,9 +1,10 @@
 fastapi
 uvicorn[standard]
-lightgbm
+lightgbm>=4,<5
 shap
 joblib
 pandas==2.1.4
 numpy==1.26.4
-scikit-learn
-pydantic
+# The model was trained and pickled with scikit-learn 1.6.1; other versions load it with a warning.
+scikit-learn==1.6.1
+pydantic>=2
