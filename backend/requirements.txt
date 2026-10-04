@@ -3,7 +3,7 @@ uvicorn[standard]
 lightgbm>=4,<5
 shap
 joblib
-pandas==2.1.4
+pandas==3.0.6
 numpy==1.26.4
 # The model was trained and pickled with scikit-learn 1.6.1; other versions load it with a warning.
 scikit-learn==1.6.1
