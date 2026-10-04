@@ -109,14 +109,30 @@ biosignal/
 
 ---
 
+## Tests and CI
+
+```bash
+# frontend: clinical score unit tests (NEWS2, qSOFA, MAP, SOFA, APACHE II)
+cd frontend && npm test
+
+# backend: API, validation and risk-threshold tests (uses the real model)
+cd backend && pip install -r requirements-dev.txt && pytest
+```
+
+GitHub Actions runs the type check, tests and production build for the frontend and the tests for the backend on every push and pull request.
+
+**Backend configuration:** `CORS_ORIGINS` (comma-separated list of allowed browser origins; defaults to the deployed frontend and localhost).
+
+---
+
 ## Known limitations
 
 - Trained on 100 demo patients only; ROC-AUC 0.71 is modest and not clinically validated.
 - Training code is not yet part of the repository (`backend/ml/` is a placeholder), so the model cannot be reproduced from source yet.
 - Model-stats charts use hard-coded values, the patient timeline is templated and the vitals chart is simulated.
 - Report Analyzer derives std/min/max from a single reading, so its ML output is only indicative.
-- NEWS2, SOFA and APACHE II are simplified and not yet verified against the reference definitions.
-- No authentication, rate limiting or automated tests yet.
+- NEWS2, SOFA and APACHE II follow the published tables and are unit-tested, but stay educational implementations (for example SpO2 Scale 2 cannot be selected in the UI and the APACHE II A-aDO2 assumes sea level).
+- No authentication or rate limiting yet.
 
 These items are tracked as the next engineering steps.
 
