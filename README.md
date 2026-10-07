@@ -48,7 +48,7 @@ BioSignal is a research / portfolio prototype that shows how vital-sign data can
 
 - **Dataset:** [MIMIC-IV Clinical Database Demo v2.2](https://physionet.org/content/mimic-iv-demo/2.2/) — an openly available subset of **100 patients** (the full MIMIC-IV needs credentialed access and is not used). Licensed under the [ODbL v1.0](https://opendatacommons.org/licenses/odbl/1-0/). Please cite PhysioNet and MIMIC-IV when you reuse it.
 - **Features (20):** mean / std / min / max of heart rate, SpO₂, systolic BP, diastolic BP and respiratory rate over a window.
-- **Training windows:** 11,021 engineered windows (8,816 train / remainder test). Reported ROC-AUC: **0.71**.
+- **Training windows (reported, not reproducible):** 11,021 windows (8,816 train / remainder test), ROC-AUC about 0.71 on a held-out set. The training code is not available, so these figures cannot be re-checked; see the [model card](docs/MODEL_CARD.md) for what is and is not known.
 - The data is not stored in this repository. Download it with:
 
 ```bash
@@ -100,8 +100,10 @@ biosignal/
 ├── backend/               # FastAPI service
 │   ├── main.py
 │   ├── models/            # trained LightGBM model + feature list
-│   ├── ml/  data/         # training / preprocessing (placeholders, work in progress)
+│   ├── scripts/           # model provenance (inspect_model.py)
+│   ├── tests/             # pytest suite
 │   └── requirements.txt
+├── docs/                  # model card
 ├── scripts/               # helper scripts (data download)
 ├── render.yaml
 └── vercel.json
@@ -128,7 +130,7 @@ GitHub Actions runs the type check, tests and production build for the frontend 
 ## Known limitations
 
 - Trained on 100 demo patients only; ROC-AUC 0.71 is modest and not clinically validated.
-- Training code is not yet part of the repository (`backend/ml/` is a placeholder), so the model cannot be reproduced from source yet.
+- The original training code is not available, so the model cannot be rebuilt from source. The model card lists what is verified and what is only reported.
 - Model-stats charts use hard-coded values, the patient timeline is templated and the vitals chart is simulated.
 - Report Analyzer derives std/min/max from a single reading, so its ML output is only indicative.
 - NEWS2, SOFA and APACHE II follow the published tables and are unit-tested, but stay educational implementations (for example SpO2 Scale 2 cannot be selected in the UI and the APACHE II A-aDO2 assumes sea level).
