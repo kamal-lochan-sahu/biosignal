@@ -1,0 +1,92 @@
+{
+  "estimator": "LGBMClassifier",
+  "sha256Prefix": "13288e74e510",
+  "nTrees": 200,
+  "nFeatures": 20,
+  "learningRate": 0.05,
+  "maxDepth": 6,
+  "classWeight": "balanced",
+  "randomState": 42,
+  "featureImportanceGain": [
+    {
+      "feature": "BP Systolic_min",
+      "share": 0.132591
+    },
+    {
+      "feature": "Heart Rate_max",
+      "share": 0.121511
+    },
+    {
+      "feature": "Respiratory Rate_mean",
+      "share": 0.095398
+    },
+    {
+      "feature": "SpO2_max",
+      "share": 0.068099
+    },
+    {
+      "feature": "SpO2_mean",
+      "share": 0.064329
+    },
+    {
+      "feature": "BP Systolic_max",
+      "share": 0.059307
+    },
+    {
+      "feature": "Respiratory Rate_max",
+      "share": 0.058852
+    },
+    {
+      "feature": "BP Systolic_mean",
+      "share": 0.057455
+    },
+    {
+      "feature": "Heart Rate_mean",
+      "share": 0.056764
+    },
+    {
+      "feature": "Heart Rate_min",
+      "share": 0.051583
+    },
+    {
+      "feature": "BP Diastolic_min",
+      "share": 0.049835
+    },
+    {
+      "feature": "BP Diastolic_mean",
+      "share": 0.048854
+    },
+    {
+      "feature": "Respiratory Rate_min",
+      "share": 0.041296
+    },
+    {
+      "feature": "BP Diastolic_max",
+      "share": 0.037612
+    },
+    {
+      "feature": "SpO2_min",
+      "share": 0.018954
+    },
+    {
+      "feature": "Heart Rate_std",
+      "share": 0.012907
+    },
+    {
+      "feature": "SpO2_std",
+      "share": 0.011649
+    },
+    {
+      "feature": "Respiratory Rate_std",
+      "share": 0.006353
+    },
+    {
+      "feature": "BP Systolic_std",
+      "share": 0.003605
+    },
+    {
+      "feature": "BP Diastolic_std",
+      "share": 0.003046
+    }
+  ]
+}
