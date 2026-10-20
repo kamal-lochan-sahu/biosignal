@@ -24,7 +24,7 @@ export default function PatientTimeline({ patientName, admitTime, vitals }: Prop
     { time: '01:00', type: 'normal',       title: 'Initial Assessment',     detail: `HR ${hr}, BP ${sbp}/—, SpO₂ ${spo2}%, RR ${rr}` },
     { time: '02:30', type: 'intervention', title: 'IV Access Established',  detail: 'Central line placed, IV fluids started' },
     { time: '04:00', type: 'alert',        title: 'Vitals Deteriorating',   detail: `SpO₂ dropped to ${Math.max(spo2-6,78)}%, HR elevated ${hr}bpm` },
-    { time: '05:00', type: 'alert',        title: 'BioSignal HIGH RISK',    detail: 'ML model predicted HIGH deterioration risk — physician notified' },
+    { time: '05:00', type: 'alert',        title: 'Risk flag: HIGH (rule-based)',    detail: 'Simple vitals rule flagged high risk (simulated escalation)' },
     { time: '06:00', type: 'intervention', title: 'O₂ Supplementation',     detail: `Supplemental O₂ started — SpO₂ recovering to ${Math.min(spo2+4,95)}%` },
     { time: '08:00', type: 'intervention', title: 'Physician Review',       detail: 'Senior physician assessed — treatment plan adjusted' },
     { time: '10:00', type: 'normal',       title: 'Monitoring Continued',   detail: `HR ${Math.max(hr-8,85)}, BP improving, RR ${Math.max(rr-4,18)}` },
@@ -32,7 +32,7 @@ export default function PatientTimeline({ patientName, admitTime, vitals }: Prop
     { time: '00:00', type: 'admission',    title: 'ICU Admission',     detail: `${patientName} admitted to ICU` },
     { time: '01:30', type: 'normal',       title: 'Vitals Stable',     detail: `HR ${hr}, BP ${sbp}/—, SpO₂ ${spo2}%, RR ${rr}` },
     { time: '03:00', type: 'intervention', title: 'IV Fluids Started', detail: '500ml NS bolus administered' },
-    { time: '05:00', type: 'normal',       title: 'BioSignal LOW RISK', detail: 'ML model predicted LOW deterioration risk — routine monitoring' },
+    { time: '05:00', type: 'normal',       title: 'Risk flag: LOW (rule-based)', detail: 'Simple vitals rule found no high-risk signs (simulated)' },
     { time: '07:00', type: 'normal',       title: 'Routine Check',     detail: `Vitals stable — HR ${hr}, SpO₂ ${spo2}%` },
     { time: '09:00', type: 'normal',       title: 'Physician Round',   detail: 'Patient stable — continue current management' },
     { time: '11:00', type: 'normal',       title: 'Vitals Improving',  detail: `HR ${Math.max(hr-5,70)}, BP ${Math.min(sbp+8,130)}/—, SpO₂ ${Math.min(spo2+2,99)}%` },
@@ -49,9 +49,15 @@ export default function PatientTimeline({ patientName, admitTime, vitals }: Prop
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '100px', background: isHighRisk ? 'var(--critical-dim)' : 'var(--success-dim)', border: `1px solid ${isHighRisk ? 'var(--critical-border)' : 'var(--success-border)'}` }}>
           <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: isHighRisk ? 'var(--clr-critical)' : 'var(--clr-success)' }} />
           <span style={{ fontSize: '10px', fontFamily: 'var(--font-data)', fontWeight: 600, color: isHighRisk ? 'var(--clr-critical)' : 'var(--clr-success)', letterSpacing: '1px' }}>
-            {isHighRisk ? 'HIGH RISK TIMELINE' : 'STABLE TIMELINE'}
+            {isHighRisk ? 'SIMULATED · HIGH RISK' : 'SIMULATED · STABLE'}
           </span>
         </div>
+      </div>
+
+      {/* Simulation notice */}
+      <div role="note" style={{ marginBottom: '16px', padding: '10px 14px', background: 'var(--warning-dim)', border: '1px solid var(--warning-border)', borderRadius: '10px', fontSize: '11px', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
+        <strong style={{ color: 'var(--clr-warning)' }}>Simulated scenario.</strong> The events below are generated from this patient&apos;s summary vitals for illustration.
+        They are not a medical record, and the risk entries come from a simple rule, not from the ML model.
       </div>
 
       {/* Timeline */}

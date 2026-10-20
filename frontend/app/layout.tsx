@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <EntryAnimation />
           <KeepAlive />
           <div className="bg-yellow-950/60 border-b border-yellow-800/50 px-4 py-2 text-center">
-            <p className="text-xs text-yellow-400">⚠️ <strong>Demo Only</strong> — BioSignal uses simulated patient data trained on MIMIC-IV. Not intended for clinical use.</p>
+            <p className="text-xs text-yellow-400">⚠️ <strong>Research demo only</strong> — the patients shown are fictional demo cases and the model was trained on the public MIMIC-IV demo dataset. It is not validated and not intended for clinical use. <a href="https://github.com/kamal-lochan-sahu/biosignal/blob/main/docs/MODEL_CARD.md" target="_blank" rel="noopener noreferrer" className="underline">Model card</a></p>
           </div>
           {children}
         </LanguageProvider>

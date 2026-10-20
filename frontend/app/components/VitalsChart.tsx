@@ -99,7 +99,7 @@ export default function VitalsChart({ data }: Props) {
             border:        '1px solid var(--primary-border)',
             color:         'var(--clr-primary)',
           }}>
-            12h window
+            Simulated · 12h
           </span>
         </div>
 

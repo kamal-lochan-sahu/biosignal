@@ -131,7 +131,7 @@ GitHub Actions runs the type check, tests and production build for the frontend 
 
 - Trained on 100 demo patients only; ROC-AUC 0.71 is modest and not clinically validated.
 - The original training code is not available, so the model cannot be rebuilt from source. The model card lists what is verified and what is only reported.
-- Model-stats charts use hard-coded values, the patient timeline is templated and the vitals chart is simulated.
+- The dashboard's model metrics are reported figures (labelled as reported, not re-measured); the patient timeline and the vitals chart are simulated and labelled as simulated.
 - Report Analyzer derives std/min/max from a single reading, so its ML output is only indicative.
 - NEWS2, SOFA and APACHE II follow the published tables and are unit-tested, but stay educational implementations (for example SpO2 Scale 2 cannot be selected in the UI and the APACHE II A-aDO2 assumes sea level).
 - No authentication or rate limiting yet.

@@ -38,7 +38,7 @@ The figures quoted in earlier versions of the README and dashboard (11,021 windo
 
 ## 4. Evaluation
 
-**Reported:** ROC-AUC of about 0.71 on a held-out test set. The dashboard's model-statistics screen shows fixed values; it does not compute them from the model.
+**Reported:** ROC-AUC of about 0.71 on a held-out test set. The dashboard's model-statistics screen shows these values labelled as reported; only its feature-importance chart and model details are read from the deployed model.
 
 **Not verified.** In particular:
 - If the split was made **per window** (as the 80/20 figures suggest), windows from the same patient can appear in both training and test data. This usually makes the reported score **optimistic**. A patient-level split (all windows of a patient on one side) is the appropriate protocol.

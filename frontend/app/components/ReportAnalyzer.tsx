@@ -64,10 +64,10 @@ function generateExplanation(v: VitalsData, result: any, clinical: ClinicalScore
     ? 'Concerning signs: ' + clinical.issues.join('; ') + '.'
     : 'Most vital signs are within acceptable range.'
   if (result.risk_level === 'HIGH')
-    return `⚠️ HIGH RISK — ${pct}% deterioration risk next 6h.\n\n${issueText}\n\nMost critical factor: ${topFactor}.\nNEWS2: ${clinical.news2} (${clinical.news2_risk}) | qSOFA: ${clinical.qsofa}/3 (${clinical.sepsis_risk}) | MAP: ${clinical.map} mmHg\n\nImmediate medical attention required.`
+    return `⚠️ HIGH RISK — model risk score ${pct}%.\n\n${issueText}\n\nMost critical factor: ${topFactor}.\nNEWS2: ${clinical.news2} (${clinical.news2_risk}) | qSOFA: ${clinical.qsofa}/3 (${clinical.sepsis_risk}) | MAP: ${clinical.map} mmHg\n\nImmediate medical attention required.`
   if (result.risk_level === 'MEDIUM')
-    return `⚡ MEDIUM RISK — ${pct}% deterioration risk next 6h.\n\n${issueText}\n\nKey factor: ${topFactor}.\nNEWS2: ${clinical.news2} (${clinical.news2_risk}) | qSOFA: ${clinical.qsofa}/3 | MAP: ${clinical.map} mmHg\n\nIncrease monitoring frequency.`
-  return `✅ LOW RISK — ${pct}% deterioration risk next 6h.\n\n${issueText}\n\nNEWS2: ${clinical.news2} (${clinical.news2_risk}) | qSOFA: ${clinical.qsofa}/3 | MAP: ${clinical.map} mmHg\n\nContinue routine monitoring.`
+    return `⚡ MEDIUM RISK — model risk score ${pct}%.\n\n${issueText}\n\nKey factor: ${topFactor}.\nNEWS2: ${clinical.news2} (${clinical.news2_risk}) | qSOFA: ${clinical.qsofa}/3 | MAP: ${clinical.map} mmHg\n\nIncrease monitoring frequency.`
+  return `✅ LOW RISK — model risk score ${pct}%.\n\n${issueText}\n\nNEWS2: ${clinical.news2} (${clinical.news2_risk}) | qSOFA: ${clinical.qsofa}/3 | MAP: ${clinical.map} mmHg\n\nContinue routine monitoring.`
 }
 
 function parseCSVVitals(csv: string): VitalsData | null {
@@ -188,7 +188,7 @@ export default function ReportAnalyzer() {
     text += `ML RISK PREDICTION\n${'-'.repeat(30)}\n`
     text += `Risk Score: ${Math.round(result.risk_score*100)}%\n`
     text += `Risk Level: ${result.risk_level}\n`
-    text += `Prediction Window: Next 6 hours\n\n`
+    text += `Model score: ranking score from a demo model, not a calibrated probability\n\n`
     text += `CLINICAL SCORES\n${'-'.repeat(30)}\n`
     text += `NEWS2 Score:  ${clinical.news2}/20  → ${clinical.news2_risk}\n`
     text += `qSOFA Score:  ${clinical.qsofa}/3   → ${clinical.sepsis_risk}\n`
@@ -399,7 +399,7 @@ export default function ReportAnalyzer() {
                 <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', marginTop:'8px', padding:'4px 12px', borderRadius:'100px', background:tk.dim, border:`1px solid ${tk.border}` }}>
                   <div style={{ width:'7px', height:'7px', borderRadius:'50%', background:tk.color, boxShadow:`0 0 6px ${tk.color}` }}/>
                   <span style={{ fontFamily:'var(--font-data)', fontSize:'11px', fontWeight:600, color:tk.color, letterSpacing:'1px' }}>
-                    {result.risk_level} RISK — Next 6h
+                    {result.risk_level} RISK
                   </span>
                 </div>
               </div>

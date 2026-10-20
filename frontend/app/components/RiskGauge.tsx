@@ -66,7 +66,7 @@ export default function RiskGauge({ score, level }: Props) {
             fill="var(--text-muted,#475569)" fontSize="9"
             fontFamily="var(--font-data,'IBM Plex Mono',monospace)"
             letterSpacing="1">
-            DETERIORATION RISK
+            MODEL RISK SCORE
           </text>
         </svg>
       </div>
@@ -88,7 +88,7 @@ export default function RiskGauge({ score, level }: Props) {
           boxShadow:`0 0 8px ${tk.color}`, transition:'width 0.9s ease' }}/>
       </div>
       <p style={{ fontSize:'10px', fontFamily:'var(--font-data)', color:'var(--text-muted)', marginTop:'-4px' }}>
-        Next 6h prediction window
+        Demo model score
       </p>
     </div>
   )

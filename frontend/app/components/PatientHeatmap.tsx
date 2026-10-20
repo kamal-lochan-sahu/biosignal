@@ -39,7 +39,7 @@ export default function PatientHeatmap({patients,results,onSelect}:Props){
               <div style={{height:'4px',background:'rgba(0,0,0,0.2)',borderRadius:'2px',overflow:'hidden',marginBottom:'8px'}}>
                 <div style={{height:'100%',width:`${pct}%`,background:tk.color,borderRadius:'2px',boxShadow:`0 0 6px ${tk.color}`,transition:'width 0.7s ease'}}/>
               </div>
-              {result?(<p style={{fontSize:'10px',fontWeight:600,color:tk.color,fontFamily:'var(--font-data)'}}>● {tk.label} RISK — Deterioration next 6h</p>):(<p style={{fontSize:'10px',color:'var(--text-muted)',fontFamily:'var(--font-data)'}}>→ ML Dashboard → Predict Risk</p>)}
+              {result?(<p style={{fontSize:'10px',fontWeight:600,color:tk.color,fontFamily:'var(--font-data)'}}>● {tk.label} RISK</p>):(<p style={{fontSize:'10px',color:'var(--text-muted)',fontFamily:'var(--font-data)'}}>→ ML Dashboard → Predict Risk</p>)}
             </div>
           )
         })}

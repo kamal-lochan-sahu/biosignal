@@ -212,8 +212,9 @@ export default function Dashboard() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col items-center justify-center">
-                          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Deterioration Risk (Next 6h)</h3>
+                          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Model Risk Score</h3>
                           <RiskGauge score={currentResult.risk_score} level={currentResult.risk_level} />
+                          <p className="mt-2 max-w-[230px] text-center text-[10px] text-gray-500">Ranking score from a demo model, not a calibrated probability.</p>
                         </div>
                         <SHAPExplainer factors={currentResult.top_factors} />
                       </div>
