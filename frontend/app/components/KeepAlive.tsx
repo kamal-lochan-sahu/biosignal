@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-const BACKEND_URL = 'https://biosignal-api.onrender.com'
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://biosignal-api.onrender.com'
 const PING_INTERVAL = 10 * 60 * 1000
 
 export default function KeepAlive() {

@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, createContext, useContext } from 'react'
+import { firstSupportedLanguage, readStored, writeStored } from '@/lib/language'
 
 export type Lang = 'en'|'hi'|'bn'|'te'|'ta'|'mr'|'gu'|'kn'|'ml'|'or'|'pa'|'zh'|'es'|'ar'|'pt'|'ru'|'ja'|'fr'|'de'|'ko'|'id'
 
@@ -345,79 +346,37 @@ export const translations: Record<Lang, Record<string, string>> = {
   },
 }
 
-// Country code → Lang mapping
-const COUNTRY_LANG: Record<string, Lang> = {
-  // India — state level via region
-  IN: 'hi', // default Indian = Hindi
-  // World
-  DE: 'de', AT: 'de', CH: 'de',
-  FR: 'fr', BE: 'fr', LU: 'fr',
-  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es',
-  PT: 'pt', BR: 'pt',
-  RU: 'ru', BY: 'ru', KZ: 'ru',
-  SA: 'ar', AE: 'ar', EG: 'ar', IQ: 'ar', SY: 'ar', JO: 'ar',
-  KW: 'ar', QA: 'ar', BH: 'ar', OM: 'ar', YE: 'ar', LB: 'ar',
-  MA: 'ar', DZ: 'ar', TN: 'ar', LY: 'ar',
-  CN: 'zh', TW: 'zh', HK: 'zh', SG: 'zh',
-  JP: 'ja', KR: 'ko', ID: 'id',
-}
-
-// India region → Lang
-const INDIA_REGION_LANG: Record<string, Lang> = {
-  'AP': 'te', 'TG': 'te',
-  'TN': 'ta', 'PY': 'ta',
-  'MH': 'mr',
-  'GJ': 'gu',
-  'KA': 'kn',
-  'KL': 'ml',
-  'OD': 'or', 'OR': 'or',
-  'WB': 'bn', 'TR': 'bn',
-  'PB': 'pa',
-}
-
 export const LanguageContext = createContext<{ lang: Lang; setLang: (l: Lang) => void; regionalLang: Lang }>({
   lang: 'en', setLang: () => {}, regionalLang: 'en'
 })
 export const useLang = () => useContext(LanguageContext)
 
+const STORAGE_KEY = 'biosignal-lang'
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>('en')
   const [regionalLang, setRegionalLang] = useState<Lang>('en')
-  const [detected, setDetected] = useState(false)
 
+  /* eslint-disable react-hooks/set-state-in-effect --
+     Browser-only values (stored choice, browser language) must be read after hydration so the
+     first client render matches the server render; the server cannot know them. */
   useEffect(() => {
-    const saved = localStorage.getItem('biosignal-lang') as Lang
-    if (saved && translations[saved]) {
-      setLangState(saved)
-    }
+    const codes = LANGUAGES.map(l => l.code)
 
-    // IP geolocation detect
-    fetch('https://ipapi.co/json/')
-      .then(r => r.json())
-      .then(data => {
-        const country = data.country_code as string
-        const region = data.region_code as string
+    // Remembered choice (stored only in this browser).
+    const saved = readStored(STORAGE_KEY)
+    const savedLang = codes.find(code => code === saved)
+    if (savedLang) setLangState(savedLang)
 
-        let detected: Lang = 'en'
-
-        if (country === 'IN') {
-          detected = INDIA_REGION_LANG[region] || 'hi'
-        } else {
-          detected = COUNTRY_LANG[country] || 'en'
-        }
-
-        setRegionalLang(detected)
-
-        // Regional detected but English is default
-        // setLangState(detected) — intentionally not auto-switching
-        setDetected(true)
-      })
-      .catch(() => setDetected(true))
+    // Suggest a language from the browser's own preference list. Nothing is sent over the network.
+    const tags = (navigator.languages?.length ? navigator.languages : [navigator.language]).filter(Boolean)
+    setRegionalLang(firstSupportedLanguage(tags, codes, 'en') ?? 'en')
   }, [])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const setLang = (l: Lang) => {
     setLangState(l)
-    localStorage.setItem('biosignal-lang', l)
+    writeStored(STORAGE_KEY, l)
   }
 
   return (
