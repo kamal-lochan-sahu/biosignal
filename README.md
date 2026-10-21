@@ -32,7 +32,7 @@ BioSignal is a research / portfolio prototype that shows how vital-sign data can
 | **Report Analyzer** | Manual entry or CSV upload → ML risk + NEWS2 + qSOFA + MAP, downloadable report |
 | **Shift report / Export** | Handover text and CSV/JSON export |
 | **Model stats** | Metrics, ROC curve and feature importance (static values, see limitations) |
-| **Platform** | 21 UI languages, installable PWA manifest, responsive layout, backend keep-alive ping |
+| **Platform** | UI labels in 21 languages (tabs and main labels; clinical content stays in English), language suggested from the browser settings, installable PWA manifest, responsive layout, backend keep-alive ping |
 
 ---
 
@@ -108,6 +108,15 @@ biosignal/
 ├── render.yaml
 └── vercel.json
 ```
+
+---
+
+## Privacy
+
+- No analytics, advertising or tracking scripts, and no cookies set by the application.
+- The only item stored in your browser is the language you choose (`localStorage`, key `biosignal-lang`).
+- A language is suggested from your browser's language settings. This is read locally and nothing is sent anywhere for it.
+- The vitals of the demo patients and anything you type or upload in the Report Analyzer are sent to the BioSignal API to compute the risk score. The API does not store them (hosting providers may keep standard request logs). **Do not enter real patient data.**
 
 ---
 
