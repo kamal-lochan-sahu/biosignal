@@ -120,6 +120,15 @@ biosignal/
 
 ---
 
+## Security
+
+- **API:** per-IP rate limit (default 60 requests per minute) and a global cap (300 per minute) on `/predict`; request bodies above 16 KB are rejected; inputs are range-validated; responses carry security headers (`nosniff`, no framing, HSTS) and predictions are never cached.
+- **Web app:** security headers on every route and a Content-Security-Policy in **report-only** mode (violations show up in the browser console; nothing is blocked yet).
+- **Dependencies:** Dependabot opens update pull requests every week.
+- Found a vulnerability? See [SECURITY.md](SECURITY.md).
+
+---
+
 ## Tests and CI
 
 ```bash
@@ -132,7 +141,7 @@ cd backend && pip install -r requirements-dev.txt && pytest
 
 GitHub Actions runs the type check, tests and production build for the frontend and the tests for the backend on every push and pull request.
 
-**Backend configuration:** `CORS_ORIGINS` (comma-separated list of allowed browser origins; defaults to the deployed frontend and localhost).
+**Backend configuration:** `CORS_ORIGINS` (comma-separated list of allowed browser origins; defaults to the deployed frontend and localhost), `RATE_LIMIT_PER_MINUTE`, `GLOBAL_RATE_LIMIT_PER_MINUTE`, `TRUSTED_PROXY_COUNT` (number of reverse proxies in front of the API, 1 by default) and `MAX_BODY_BYTES`.
 
 ---
 
@@ -143,7 +152,7 @@ GitHub Actions runs the type check, tests and production build for the frontend 
 - The dashboard's model metrics are reported figures (labelled as reported, not re-measured); the patient timeline and the vitals chart are simulated and labelled as simulated.
 - Report Analyzer derives std/min/max from a single reading, so its ML output is only indicative.
 - NEWS2, SOFA and APACHE II follow the published tables and are unit-tested, but stay educational implementations (for example SpO2 Scale 2 cannot be selected in the UI and the APACHE II A-aDO2 assumes sea level).
-- No authentication or rate limiting yet.
+- No user authentication: the demo API is public (it is rate limited).
 
 These items are tracked as the next engineering steps.
 
