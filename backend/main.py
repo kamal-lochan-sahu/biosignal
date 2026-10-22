@@ -3,6 +3,7 @@
 Research / demo project, not a medical device and not intended for clinical use.
 """
 import json
+import math
 import os
 from pathlib import Path
 
@@ -10,11 +11,14 @@ import joblib
 import numpy as np
 import pandas as pd
 import shap
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
+from config import load_settings
+from ratelimit import SlidingWindowLimiter, client_ip
 from risk import risk_level_for
 from schemas import FEATURE_COLUMNS, PredictionResponse, TopFactor, VitalsInput, to_feature_row
+from security import BodySizeLimitMiddleware, SecurityHeadersMiddleware
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "models" / "biosignal_model.pkl"
@@ -24,6 +28,8 @@ FEATURES_PATH = BASE_DIR / "models" / "feature_cols.json"
 DEFAULT_CORS_ORIGINS = "https://biosignal-puce.vercel.app,http://localhost:3000,http://127.0.0.1:3000"
 TOP_FACTOR_COUNT = 5
 
+settings = load_settings()
+
 
 def allowed_origins() -> list[str]:
     raw = os.getenv("CORS_ORIGINS", DEFAULT_CORS_ORIGINS)
@@ -32,16 +38,39 @@ def allowed_origins() -> list[str]:
 
 app = FastAPI(
     title="BioSignal API",
-    version="0.2.0",
+    version="0.3.0",
     description="ICU patient deterioration risk. Research / demo only - not a medical device.",
 )
 
+# Middleware order: the last one added is the outermost. CORS stays outermost so that 413 / 429 responses
+# also carry CORS headers and the browser can read them.
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_body_bytes)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins(),
     allow_methods=["GET", "HEAD", "POST", "OPTIONS"],
     allow_headers=["Content-Type"],
 )
+
+# --- Rate limiting (per client IP, plus a global cap as a safety net that does not depend on proxy set-up) ---
+ip_limiter = SlidingWindowLimiter(settings.rate_limit_per_minute)
+global_limiter = SlidingWindowLimiter(settings.global_rate_limit_per_minute)
+
+
+def enforce_rate_limit(request: Request) -> None:
+    for limiter, key in (
+        (ip_limiter, client_ip(request, settings.trusted_proxy_count)),
+        (global_limiter, "global"),
+    ):
+        allowed, retry_after = limiter.check(key)
+        if not allowed:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many requests. Please retry shortly.",
+                headers={"Retry-After": str(max(1, math.ceil(retry_after)))},
+            )
+
 
 # --- Model (loaded once at start-up; paths do not depend on the working directory) ---
 model = joblib.load(MODEL_PATH)
@@ -73,7 +102,7 @@ def health_check():
     return {"status": "ok"}
 
 
-@app.post("/predict", response_model=PredictionResponse)
+@app.post("/predict", response_model=PredictionResponse, dependencies=[Depends(enforce_rate_limit)])
 def predict(vitals: VitalsInput) -> PredictionResponse:
     frame = pd.DataFrame([to_feature_row(vitals)], columns=feature_cols)
 
