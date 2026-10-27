@@ -57,14 +57,22 @@ class SlidingWindowLimiter:
             return True, 0.0
 
 
-def client_ip(request: Request, trusted_proxies: int) -> str:
+def client_ip(request: Request, trusted_proxies: int, header: str = "") -> str:
     """Best-effort client address.
 
     Behind `trusted_proxies` reverse proxies, each one appends the address it received the request from to
     X-Forwarded-For. A client can only add entries on the LEFT, so the entry `trusted_proxies` positions from the
     right is the one added by our own infrastructure and cannot be spoofed. With fewer entries than expected
     (direct access, wrong setting) the socket address is used instead.
+
+    If `header` is given (CLIENT_IP_HEADER), a platform-provided header holding the real client address, for
+    example one that the edge proxy overwrites on every request, it takes precedence. Only configure a header
+    that clients cannot set themselves.
     """
+    if header:
+        value = request.headers.get(header, "").split(",")[0].strip()
+        if value:
+            return value
     if trusted_proxies > 0:
         header = request.headers.get("x-forwarded-for", "")
         hops = [hop.strip() for hop in header.split(",") if hop.strip()]

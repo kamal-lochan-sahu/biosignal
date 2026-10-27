@@ -60,7 +60,7 @@ global_limiter = SlidingWindowLimiter(settings.global_rate_limit_per_minute)
 
 def enforce_rate_limit(request: Request) -> None:
     for limiter, key in (
-        (ip_limiter, client_ip(request, settings.trusted_proxy_count)),
+        (ip_limiter, client_ip(request, settings.trusted_proxy_count, settings.client_ip_header)),
         (global_limiter, "global"),
     ):
         allowed, retry_after = limiter.check(key)
@@ -92,6 +92,7 @@ def positive_class_contributions(shap_values) -> list[float]:
 
 
 @app.get("/")
+@app.head("/")  # Render's health check sends HEAD /
 def root():
     return {"status": "BioSignal API running"}
 
@@ -100,6 +101,30 @@ def root():
 @app.head("/health")
 def health_check():
     return {"status": "ok"}
+
+
+PROXY_HEADERS = ("x-forwarded-for", "x-forwarded-proto", "x-real-ip", "forwarded", "cf-connecting-ip", "true-client-ip", "x-client-ip")
+SENSITIVE_HEADERS = {"authorization", "cookie", "proxy-authorization", "x-api-key"}
+
+
+@app.get("/debug/client", include_in_schema=False)
+def debug_client(request: Request):
+    """Temporary diagnostic to pick the right proxy settings. Disabled (404) unless ENABLE_CLIENT_DEBUG is set.
+
+    It only describes the caller's own request: the proxy headers it arrived with and the rate-limit key chosen
+    for it. Header names are listed without values, except for the proxy headers above; credentials are never shown.
+    """
+    if not settings.enable_client_debug:
+        raise HTTPException(status_code=404, detail="Not Found")
+    headers = request.headers
+    return {
+        "chosen_key": client_ip(request, settings.trusted_proxy_count, settings.client_ip_header),
+        "trusted_proxy_count": settings.trusted_proxy_count,
+        "client_ip_header": settings.client_ip_header or None,
+        "socket_host": request.client.host if request.client else None,
+        "proxy_headers": {name: headers.get(name) for name in PROXY_HEADERS if name in headers},
+        "header_names": sorted(name for name in headers.keys() if name not in SENSITIVE_HEADERS),
+    }
 
 
 @app.post("/predict", response_model=PredictionResponse, dependencies=[Depends(enforce_rate_limit)])
