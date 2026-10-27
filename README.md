@@ -141,7 +141,7 @@ cd backend && pip install -r requirements-dev.txt && pytest
 
 GitHub Actions runs the type check, tests and production build for the frontend and the tests for the backend on every push and pull request.
 
-**Backend configuration:** `CORS_ORIGINS` (comma-separated list of allowed browser origins; defaults to the deployed frontend and localhost), `RATE_LIMIT_PER_MINUTE`, `GLOBAL_RATE_LIMIT_PER_MINUTE`, `TRUSTED_PROXY_COUNT` (number of reverse proxies in front of the API, 1 by default) and `MAX_BODY_BYTES`.
+**Backend configuration:** `CORS_ORIGINS` (comma-separated list of allowed browser origins; defaults to the deployed frontend and localhost), `RATE_LIMIT_PER_MINUTE`, `GLOBAL_RATE_LIMIT_PER_MINUTE`, `TRUSTED_PROXY_COUNT` (number of reverse proxies in front of the API, 1 by default) `MAX_BODY_BYTES`, `CLIENT_IP_HEADER` (a header your hosting proxy sets to the real client address, if it has one) and `ENABLE_CLIENT_DEBUG` (temporary diagnostic endpoint, off by default; see [docs/OPERATIONS.md](docs/OPERATIONS.md)).
 
 ---
 
