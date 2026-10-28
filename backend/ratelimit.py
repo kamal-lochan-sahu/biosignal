@@ -5,6 +5,7 @@ scaled to several instances, replace this with a shared store (for example Redis
 """
 from __future__ import annotations
 
+import ipaddress
 import threading
 import time
 from collections import OrderedDict, deque
@@ -57,6 +58,29 @@ class SlidingWindowLimiter:
             return True, 0.0
 
 
+MAX_KEY_LENGTH = 64
+
+
+def normalize_client_key(raw: str) -> str:
+    """Canonical rate-limit key for a client address.
+
+    IPv6 clients are keyed by their /64 network: a single customer normally controls a whole /64 and can switch
+    between its addresses at will, so limiting per full address would be trivial to bypass. IPv4-mapped IPv6
+    addresses become plain IPv4. Anything that is not an IP address is kept as is, but cut to a bounded length
+    so that a forged header cannot inflate memory use.
+    """
+    value = raw.strip().split("%", 1)[0][:MAX_KEY_LENGTH]
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError:
+        return value
+    if isinstance(address, ipaddress.IPv6Address):
+        if address.ipv4_mapped is not None:
+            return str(address.ipv4_mapped)
+        return str(ipaddress.ip_network(f"{address}/64", strict=False))
+    return str(address)
+
+
 def client_ip(request: Request, trusted_proxies: int, header: str = "") -> str:
     """Best-effort client address.
 
@@ -72,10 +96,10 @@ def client_ip(request: Request, trusted_proxies: int, header: str = "") -> str:
     if header:
         value = request.headers.get(header, "").split(",")[0].strip()
         if value:
-            return value
+            return normalize_client_key(value)
     if trusted_proxies > 0:
-        header = request.headers.get("x-forwarded-for", "")
-        hops = [hop.strip() for hop in header.split(",") if hop.strip()]
+        forwarded = request.headers.get("x-forwarded-for", "")
+        hops = [hop.strip() for hop in forwarded.split(",") if hop.strip()]
         if len(hops) >= trusted_proxies:
-            return hops[-trusted_proxies]
-    return request.client.host if request.client else "unknown"
+            return normalize_client_key(hops[-trusted_proxies])
+    return normalize_client_key(request.client.host) if request.client else "unknown"
