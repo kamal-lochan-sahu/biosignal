@@ -7,3 +7,7 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      # Render puts Cloudflare and its own proxy in front of the app: X-Forwarded-For has three entries
+      # (client, Cloudflare edge, Render proxy). See docs/OPERATIONS.md. The live service is configured in the dashboard.
+      - key: TRUSTED_PROXY_COUNT
+        value: "3"

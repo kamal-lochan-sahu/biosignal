@@ -5,11 +5,26 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      # one pull request for all minor and patch updates instead of one per package
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+
   - package-ecosystem: pip
     directory: /backend
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # The model file was written with scikit-learn 1.6.1 (a test enforces it); pandas and numpy are pinned for the host.
+      # Change these deliberately, together with a retrained or re-checked model.
+      - dependency-name: scikit-learn
+      - dependency-name: pandas
+      - dependency-name: numpy
+    groups:
+      pip-minor-and-patch:
+        update-types: [minor, patch]
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
