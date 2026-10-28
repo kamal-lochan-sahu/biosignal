@@ -37,3 +37,24 @@ Settings (environment variables on the host):
    If more than 60 get through, the key is still not stable.
 
 The global limit (`GLOBAL_RATE_LIMIT_PER_MINUTE`) applies regardless of this setting and protects the instance either way.
+
+## Render (checked October 2026)
+
+The proxy chain in front of the API on Render, as shown by `/debug/client`:
+
+```
+X-Forwarded-For: <client>, <Cloudflare edge address>, <Render internal proxy 10.x>
+```
+
+- The middle entry changes from request to request, so `TRUSTED_PROXY_COUNT=2` keys the limiter on a rotating Cloudflare
+  address: clients get many buckets and nobody is limited per client.
+- **`TRUSTED_PROXY_COUNT=3`** selects the first entry, the real client. Entries a client sends itself can only appear on the
+  left of it, so a forged `X-Forwarded-For` does not change the key (covered by tests).
+- Verified: `/debug/client` returned the same key on repeated calls, and 100 parallel requests from one client gave
+  60 accepted and 40 rejected with `429`.
+- `CF-Connecting-IP` carries the same address and could be used with `CLIENT_IP_HEADER` instead; the header position
+  approach was chosen because it does not depend on a Cloudflare-specific header.
+- IPv6 clients are limited per `/64` network, and addresses that carry no valid IP are kept at a bounded length.
+- Mobile carriers often share one public address between many users; they then share one per-IP budget.
+- If Render changes its proxy chain, re-run the steps above: the key will stop being stable or stop matching the client.
+- Keep `ENABLE_CLIENT_DEBUG` unset in normal operation.
