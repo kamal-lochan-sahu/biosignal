@@ -5,6 +5,15 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      # Major versions of the dev tooling are adopted deliberately, not automatically:
+      # @types/node has to match the Node 20 runtime; typescript and vitest majors need their own check.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: vitest
+        update-types: ["version-update:semver-major"]
     groups:
       # one pull request for all minor and patch updates instead of one per package
       npm-minor-and-patch:
@@ -21,6 +30,12 @@ updates:
       - dependency-name: scikit-learn
       - dependency-name: pandas
       - dependency-name: numpy
+      # Ranges, not pins: the host installs the newest matching version anyway, so a pull request would only raise the
+      # lower bound (or widen the upper one for lightgbm, which the model depends on).
+      - dependency-name: lightgbm
+      - dependency-name: pydantic
+      - dependency-name: httpx
+      - dependency-name: pytest
     groups:
       pip-minor-and-patch:
         update-types: [minor, patch]
